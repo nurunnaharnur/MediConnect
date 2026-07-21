@@ -1,22 +1,20 @@
 {
-  "name": "mediconnect-backend",
+  "name": "mediconnect",
   "version": "1.0.0",
-  "description": "MediConnect Backend Server",
-  "main": "/server/server.js",
+  "description": "",
+  "license": "ISC",
+  "author": "Nur",
   "type": "module",
+  "main": "index.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon --env-file=.env server/server.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/index.js",
+    "seed:doctors": "node server/seed/seedDoctors.js"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
-    "cors": "^2.8.6",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
-    "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.3.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.1.14"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.8.0",
+    "pdfkit": "^0.19.1"
   }
 }
