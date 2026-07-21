@@ -1,10 +1,14 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 import homeRoutes from './routes/homeRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
 import { NotificationService } from './services/notificationService.js';
+import { connectDB } from './config/db.js';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -24,7 +28,8 @@ app.use('/api/home', homeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/reminders', reminderRoutes);
 
-app.listen(PORT, '0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', async () => {
   console.log(`MediConnect Server running on http://localhost:${PORT}`);
+  await connectDB();
   NotificationService.startScheduler(15000);
 });

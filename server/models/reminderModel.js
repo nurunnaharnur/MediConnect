@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { db } from '../config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -71,10 +72,27 @@ export function enrichCourseProgress(reminder) {
 }
 
 export class ReminderModel {
-  static getAll() {
+  static async getAll() {
+    if (db) {
+      try {
+        const raw = await db.collection('reminders').find({}).toArray();
+        const enriched = [];
+        for (const r of raw) {
+          const item = enrichCourseProgress(r);
+          if (item.status !== r.status) {
+            await db.collection('reminders').updateOne({ id: r.id }, { $set: { status: item.status } });
+          }
+          enriched.push(item);
+        }
+        return enriched;
+      } catch (err) {
+        console.error("MongoDB reminders fetch failed, falling back to local files:", err);
+      }
+    }
+
+    // Local JSON Fallback
     const raw = loadReminders();
     let updated = false;
-
     const enriched = raw.map(r => {
       const item = enrichCourseProgress(r);
       if (item.status !== r.status) {
@@ -90,13 +108,20 @@ export class ReminderModel {
     return enriched;
   }
 
-  static getById(id) {
-    const reminders = ReminderModel.getAll();
+  static async getById(id) {
+    if (db) {
+      try {
+        const reminder = await db.collection('reminders').findOne({ id });
+        return reminder ? enrichCourseProgress(reminder) : null;
+      } catch (err) {
+        console.error("MongoDB getById failed, falling back:", err);
+      }
+    }
+    const reminders = await ReminderModel.getAll();
     return reminders.find(r => r.id === id);
   }
 
-  static create(data) {
-    const reminders = loadReminders();
+  static async create(data) {
     const startDate = data.startDate || new Date().toISOString().split('T')[0];
     const durationDays = parseInt(data.durationDays, 10) || 7;
     const endDate = calculateEndDate(startDate, durationDays);
@@ -120,20 +145,52 @@ export class ReminderModel {
       createdAt: new Date().toISOString()
     };
 
+    if (db) {
+      try {
+        await db.collection('reminders').insertOne(newReminder);
+        return enrichCourseProgress(newReminder);
+      } catch (err) {
+        console.error("MongoDB insert failed, falling back to JSON:", err);
+      }
+    }
+
+    const reminders = loadReminders();
     reminders.push(newReminder);
     saveReminders(reminders);
     return enrichCourseProgress(newReminder);
   }
 
-  static updateStatus(id, newStatus, snoozeMinutes = 15) {
+  static async updateStatus(id, newStatus, snoozeMinutes = 15) {
+    let snoozeTime = null;
+    if (newStatus === 'snoozed') {
+      snoozeTime = new Date(Date.now() + snoozeMinutes * 60 * 1000).toISOString();
+    }
+
+    if (db) {
+      try {
+        const updateDoc = {
+          $set: { status: newStatus, updatedAt: new Date().toISOString() }
+        };
+        if (snoozeTime) {
+          updateDoc.$set.snoozedUntil = snoozeTime;
+        } else {
+          updateDoc.$unset = { snoozedUntil: "" };
+        }
+
+        await db.collection('reminders').updateOne({ id }, updateDoc);
+        return await ReminderModel.getById(id);
+      } catch (err) {
+        console.error("MongoDB updateStatus failed, falling back:", err);
+      }
+    }
+
     const reminders = loadReminders();
     const index = reminders.findIndex(r => r.id === id);
     if (index === -1) return null;
 
     reminders[index].status = newStatus;
     if (newStatus === 'snoozed') {
-      const snoozeTime = new Date(Date.now() + snoozeMinutes * 60 * 1000);
-      reminders[index].snoozedUntil = snoozeTime.toISOString();
+      reminders[index].snoozedUntil = snoozeTime;
     } else {
       delete reminders[index].snoozedUntil;
     }
@@ -143,7 +200,24 @@ export class ReminderModel {
     return enrichCourseProgress(reminders[index]);
   }
 
-  static updateNotificationTime(id, isoTimestamp) {
+  static async updateNotificationTime(id, isoTimestamp) {
+    if (db) {
+      try {
+        const updateDoc = {
+          $set: { lastNotifiedAt: isoTimestamp, updatedAt: isoTimestamp }
+        };
+        const reminder = await db.collection('reminders').findOne({ id });
+        if (reminder && reminder.status === 'snoozed') {
+          updateDoc.$set.status = 'pending';
+          updateDoc.$unset = { snoozedUntil: "" };
+        }
+        await db.collection('reminders').updateOne({ id }, updateDoc);
+        return await ReminderModel.getById(id);
+      } catch (err) {
+        console.error("MongoDB updateNotificationTime failed, falling back:", err);
+      }
+    }
+
     const reminders = loadReminders();
     const index = reminders.findIndex(r => r.id === id);
     if (index === -1) return null;
@@ -159,7 +233,16 @@ export class ReminderModel {
     return enrichCourseProgress(reminders[index]);
   }
 
-  static delete(id) {
+  static async delete(id) {
+    if (db) {
+      try {
+        const res = await db.collection('reminders').deleteOne({ id });
+        return res.deletedCount > 0;
+      } catch (err) {
+        console.error("MongoDB delete failed, falling back:", err);
+      }
+    }
+
     const reminders = loadReminders();
     const index = reminders.findIndex(r => r.id === id);
     if (index === -1) return false;

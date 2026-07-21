@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ReminderModel } from '../models/reminderModel.js';
+import { db } from '../config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -34,15 +35,26 @@ export function saveNotifications(notifications) {
 }
 
 export class NotificationService {
-  static getLogs(limit = 50) {
+  static async getLogs(limit = 50) {
+    if (db) {
+      try {
+        const logs = await db.collection('notifications')
+          .find({})
+          .sort({ timestamp: -1 })
+          .limit(limit)
+          .toArray();
+        return logs;
+      } catch (err) {
+        console.error("MongoDB getLogs failed, falling back to files:", err);
+      }
+    }
+
     const logs = loadNotifications();
     return logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, limit);
   }
 
-  static dispatchNotification(reminder, channel = 'push', isTest = false) {
-    const logs = loadNotifications();
+  static async dispatchNotification(reminder, channel = 'push', isTest = false) {
     const now = new Date();
-    
     let recipient = 'Browser User';
     let detail = '';
 
@@ -74,14 +86,24 @@ export class NotificationService {
 
     console.log(`🔔 AUTOMATED NOTIFICATION DELIVERED [${channel.toUpperCase()}]:`, detail);
 
+    if (db) {
+      try {
+        await db.collection('notifications').insertOne(notificationRecord);
+        return notificationRecord;
+      } catch (err) {
+        console.error("MongoDB insert notification failed, falling back to file:", err);
+      }
+    }
+
+    const logs = loadNotifications();
     logs.push(notificationRecord);
     saveNotifications(logs);
 
     return notificationRecord;
   }
 
-  static checkDueReminders() {
-    const reminders = ReminderModel.getAll();
+  static async checkDueReminders() {
+    const reminders = await ReminderModel.getAll();
     const now = new Date();
     const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
     const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -90,7 +112,6 @@ export class NotificationService {
     const newlyTriggered = [];
 
     for (const r of reminders) {
-      // Auto-expired or finished schedules do NOT send notifications
       if (r.status === 'taken' || r.status === 'skipped' || r.status === 'expired' || r.isExpired) continue;
 
       let isDue = false;
@@ -98,7 +119,7 @@ export class NotificationService {
       // Check custom days filter if frequency === 'Custom'
       if (r.frequency === 'Custom' && Array.isArray(r.customDays) && r.customDays.length > 0) {
         if (!r.customDays.includes(currentDayName)) {
-          continue; // Skip if today is not a custom scheduled day
+          continue;
         }
       }
 
@@ -121,13 +142,13 @@ export class NotificationService {
 
       if (isDue) {
         const channels = (r.channels && r.channels.length > 0) ? r.channels : ['push'];
-        channels.forEach(ch => {
-          const notif = NotificationService.dispatchNotification(r, ch, false);
+        for (const ch of channels) {
+          const notif = await NotificationService.dispatchNotification(r, ch, false);
           newlyTriggered.push(notif);
-        });
+        }
 
         // Update reminder lastNotifiedAt and reset snoozed status
-        ReminderModel.updateNotificationTime(r.id, now.toISOString());
+        await ReminderModel.updateNotificationTime(r.id, now.toISOString());
       }
     }
 
@@ -136,16 +157,19 @@ export class NotificationService {
 
   static startScheduler(intervalMs = 15000) {
     console.log('⏰ MediConnect Notification Engine Scheduler Started (Interval: 15s)');
-    // Initial run
-    try {
-      NotificationService.checkDueReminders();
-    } catch (e) {
-      console.error('Error in initial notification check:', e);
-    }
-
-    setInterval(() => {
+    
+    // Initial async run
+    (async () => {
       try {
-        NotificationService.checkDueReminders();
+        await NotificationService.checkDueReminders();
+      } catch (e) {
+        console.error('Error in initial notification check:', e);
+      }
+    })();
+
+    setInterval(async () => {
+      try {
+        await NotificationService.checkDueReminders();
       } catch (e) {
         console.error('Error in scheduled notification check:', e);
       }

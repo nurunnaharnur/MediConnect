@@ -15,7 +15,7 @@ export async function createReminder(req, res) {
       return res.status(400).json({ error: 'Reminder time is required.' });
     }
 
-    const newReminder = ReminderModel.create({
+    const newReminder = await ReminderModel.create({
       medicineName: medicineName.trim(),
       dosage: dosage.trim(),
       time: time.trim(),
@@ -41,7 +41,7 @@ export async function createReminder(req, res) {
 
 export async function getAllReminders(req, res) {
   try {
-    const reminders = ReminderModel.getAll();
+    const reminders = await ReminderModel.getAll();
     return res.status(200).json({
       count: reminders.length,
       reminders
@@ -55,7 +55,7 @@ export async function getAllReminders(req, res) {
 export async function getReminderById(req, res) {
   try {
     const { id } = req.params;
-    const reminder = ReminderModel.getById(id);
+    const reminder = await ReminderModel.getById(id);
     if (!reminder) {
       return res.status(404).json({ error: 'Medicine reminder not found.' });
     }
@@ -78,7 +78,7 @@ export async function updateReminderStatus(req, res) {
       });
     }
 
-    const updated = ReminderModel.updateStatus(id, status, snoozeMinutes || 15);
+    const updated = await ReminderModel.updateStatus(id, status, snoozeMinutes || 15);
     if (!updated) {
       return res.status(404).json({ error: 'Medicine reminder not found.' });
     }
@@ -96,7 +96,7 @@ export async function updateReminderStatus(req, res) {
 export async function deleteReminder(req, res) {
   try {
     const { id } = req.params;
-    const deleted = ReminderModel.delete(id);
+    const deleted = await ReminderModel.delete(id);
     if (!deleted) {
       return res.status(404).json({ error: 'Medicine reminder not found.' });
     }
@@ -109,7 +109,7 @@ export async function deleteReminder(req, res) {
 
 export async function getNotificationLogs(req, res) {
   try {
-    const logs = NotificationService.getLogs();
+    const logs = await NotificationService.getLogs();
     return res.status(200).json({ count: logs.length, logs });
   } catch (error) {
     console.error('Error fetching notification logs:', error);
@@ -119,15 +119,14 @@ export async function getNotificationLogs(req, res) {
 
 export async function triggerTestNotification(req, res) {
   try {
-    const { reminderId, channel, customMessage } = req.body;
+    const { reminderId, channel } = req.body;
     let reminder = null;
 
     if (reminderId) {
-      reminder = ReminderModel.getById(reminderId);
+      reminder = await ReminderModel.getById(reminderId);
     }
 
     if (!reminder) {
-      // Use sample reminder if not found
       reminder = {
         id: 'test_sample',
         medicineName: 'Paracetamol 500mg',
@@ -138,7 +137,11 @@ export async function triggerTestNotification(req, res) {
     }
 
     const channelsToTrigger = channel ? [channel] : (reminder.channels || ['push', 'sms', 'email']);
-    const results = channelsToTrigger.map(ch => NotificationService.dispatchNotification(reminder, ch, true));
+    const results = [];
+    for (const ch of channelsToTrigger) {
+      const resVal = await NotificationService.dispatchNotification(reminder, ch, true);
+      results.push(resVal);
+    }
 
     return res.status(200).json({
       message: 'Test notification triggered successfully!',
@@ -152,8 +155,8 @@ export async function triggerTestNotification(req, res) {
 
 export async function checkDueNotifications(req, res) {
   try {
-    const newlyTriggered = NotificationService.checkDueReminders();
-    const logs = NotificationService.getLogs(20);
+    const newlyTriggered = await NotificationService.checkDueReminders();
+    const logs = await NotificationService.getLogs(20);
     return res.status(200).json({
       newCount: newlyTriggered.length,
       newlyTriggered,
@@ -164,4 +167,3 @@ export async function checkDueNotifications(req, res) {
     return res.status(500).json({ error: 'Failed to check due notifications.' });
   }
 }
-
