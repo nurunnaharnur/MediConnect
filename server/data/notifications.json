@@ -1,0 +1,41 @@
+[
+  {
+    "id": "notif_1784642994312_t0xs",
+    "reminderId": "test_sample",
+    "medicineName": "Paracetamol 500mg",
+    "dosage": "1 Tablet after meal",
+    "channel": "push",
+    "recipient": "Web Browser Client",
+    "message": "Time to take Paracetamol 500mg (1 Tablet after meal)",
+    "detail": "[Web Push API] Desktop Alert: \"Time to take Paracetamol 500mg - 1 Tablet after meal\"",
+    "timestamp": "2026-07-21T14:09:54.312Z",
+    "status": "delivered",
+    "isTest": true
+  },
+  {
+    "id": "notif_1784642994315_1i4y",
+    "reminderId": "test_sample",
+    "medicineName": "Paracetamol 500mg",
+    "dosage": "1 Tablet after meal",
+    "channel": "sms",
+    "recipient": "+15550192834",
+    "message": "Time to take Paracetamol 500mg (1 Tablet after meal)",
+    "detail": "[Twilio Gateway] SMS sent to +15550192834: \"Reminder: Take Paracetamol 500mg (1 Tablet after meal) now.\"",
+    "timestamp": "2026-07-21T14:09:54.315Z",
+    "status": "delivered",
+    "isTest": true
+  },
+  {
+    "id": "notif_1784642994316_haxd",
+    "reminderId": "test_sample",
+    "medicineName": "Paracetamol 500mg",
+    "dosage": "1 Tablet after meal",
+    "channel": "email",
+    "recipient": "test@mediconnect.health",
+    "message": "Time to take Paracetamol 500mg (1 Tablet after meal)",
+    "detail": "[SendGrid Service] Email dispatched to test@mediconnect.health: Subject \"MediConnect Reminder: Paracetamol 500mg\"",
+    "timestamp": "2026-07-21T14:09:54.316Z",
+    "status": "delivered",
+    "isTest": true
+  }
+]

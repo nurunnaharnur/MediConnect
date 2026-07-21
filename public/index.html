@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediConnect | Feature 16: Recurring & Auto-Expiring Schedules</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="background-globes">
+    <div class="globe globe-1"></div>
+    <div class="globe globe-2"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="navbar">
+      <div class="logo-area">
+        <div class="logo-icon">💊</div>
+        <div class="logo-text">
+          <h1>MediConnect</h1>
+          <span class="subtitle">Feature 16: Recurring & Auto-Expiring Medicine Schedules</span>
+        </div>
+      </div>
+      <div class="nav-badges">
+        <span class="badge badge-pulse">● System Live</span>
+        <span class="badge badge-role">Patient Dashboard</span>
+      </div>
+    </header>
+
+    <!-- Browser Push Banner -->
+    <div id="pushPermissionBanner" class="push-banner">
+      <div class="banner-info">
+        <span class="banner-icon">🔔</span>
+        <div>
+          <strong>Enable Desktop Web Push Notifications</strong>
+          <p>Get real-time automated browser popups at exact scheduled dosage times.</p>
+        </div>
+      </div>
+      <div class="banner-actions">
+        <span id="pushStatusBadge" class="status-pill disabled">Push Permission: Default</span>
+        <button id="enablePushBtn" class="btn btn-sm btn-accent">Enable Push Notifications</button>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <main class="content-grid">
+      <!-- Creation Form Card -->
+      <section class="card form-card">
+        <div class="card-header">
+          <h2>⏰ Create Medicine Reminder</h2>
+          <p>Configure recurring schedules, course duration, and multi-channel alerts.</p>
+        </div>
+
+        <form id="reminderForm" class="reminder-form">
+          <div class="form-group">
+            <label for="medicineName">Medicine Name & Strength <span class="req">*</span></label>
+            <input type="text" id="medicineName" placeholder="e.g. Paracetamol 500mg, Amoxicillin" required>
+          </div>
+
+          <div class="form-group">
+            <label for="dosage">Dosage Instructions <span class="req">*</span></label>
+            <input type="text" id="dosage" placeholder="e.g. 1 Tablet after meal, 5ml syrup" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reminderTime">Scheduled Time <span class="req">*</span></label>
+              <input type="time" id="reminderTime" required>
+            </div>
+
+            <div class="form-group">
+              <label for="frequency">Frequency & Recurrence <span class="req">*</span></label>
+              <select id="frequency">
+                <option value="Daily">Daily (Once a day)</option>
+                <option value="Twice Daily">Twice Daily (Morning & Night)</option>
+                <option value="Weekly">Weekly (Once a week)</option>
+                <option value="Custom">Custom Days Schedule</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dynamic Second Time Slot (Twice Daily) -->
+          <div class="form-group" id="secondTimeGroup" style="display: none;">
+            <label for="secondTime">Second Dose Time (Evening/Night) <span class="req">*</span></label>
+            <input type="time" id="secondTime" value="20:00">
+          </div>
+
+          <!-- Dynamic Custom Days Selection (Custom) -->
+          <div class="form-group" id="customDaysGroup" style="display: none;">
+            <label>Recurrence Days <span class="req">*</span></label>
+            <div class="day-pills">
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Mon" checked><span>Mon</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Tue"><span>Tue</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Wed" checked><span>Wed</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Thu"><span>Thu</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Fri" checked><span>Fri</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Sat"><span>Sat</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Sun"><span>Sun</span></label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startDate">Course Start Date</label>
+              <input type="date" id="startDate">
+            </div>
+
+            <div class="form-group">
+              <label for="durationDays">Course Duration (Days)</label>
+              <input type="number" id="durationDays" min="1" max="365" value="7">
+            </div>
+          </div>
+
+          <!-- Notification Channels -->
+          <div class="form-group channels-group">
+            <label>Automated Notification Channels <span class="req">*</span></label>
+            <div class="checkbox-row">
+              <label class="checkbox-label">
+                <input type="checkbox" id="chPush" checked>
+                <span class="badge-chip badge-push">🔔 Browser Push</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="chSMS" checked>
+                <span class="badge-chip badge-sms">📱 SMS Alert</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="chEmail" checked>
+                <span class="badge-chip badge-email">✉️ Email Digest</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row optional-contacts">
+            <div class="form-group">
+              <label for="phoneNumber">SMS Phone Number</label>
+              <input type="tel" id="phoneNumber" placeholder="+1 (555) 019-2834" value="+1 (555) 019-2834">
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" placeholder="patient@mediconnect.health" value="patient@mediconnect.health">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <span>➕ Add Schedule & Enable Alerts</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Active Reminders List Card -->
+      <section class="card list-card">
+        <div class="card-header flex-between">
+          <div>
+            <h2>📋 Active Medicine Schedule & Course Progress</h2>
+            <p>Track daily dosages, monitor course progress, and view auto-expired schedules.</p>
+          </div>
+          <button id="refreshBtn" class="btn btn-secondary btn-sm">🔄 Refresh</button>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+          <button class="tab-btn active" data-filter="all">All (<span id="countAll">0</span>)</button>
+          <button class="tab-btn" data-filter="pending">Pending (<span id="countPending">0</span>)</button>
+          <button class="tab-btn" data-filter="taken">Taken (<span id="countTaken">0</span>)</button>
+          <button class="tab-btn" data-filter="snoozed">Snoozed (<span id="countSnoozed">0</span>)</button>
+          <button class="tab-btn" data-filter="expired">Expired (<span id="countExpired">0</span>)</button>
+        </div>
+
+        <!-- Reminders Container -->
+        <div id="remindersList" class="reminders-list">
+          <div class="empty-state">
+            <div class="empty-icon">💊</div>
+            <p>No medicine reminders added yet.</p>
+            <small>Use the form on the left to schedule your first reminder.</small>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Notification Logs Panel -->
+    <section class="card notification-card">
+      <div class="card-header flex-between">
+        <div>
+          <h2>🔔 Live Automated Notification History & Dispatch Log</h2>
+          <p>Real-time delivery log of background notifications sent via Browser Push, SMS, and Email.</p>
+        </div>
+        <div class="header-actions">
+          <button id="testNotifBtn" class="btn btn-accent btn-sm">🧪 Test Instant Notification</button>
+          <button id="refreshLogsBtn" class="btn btn-secondary btn-sm">🔄 Refresh Logs</button>
+        </div>
+      </div>
+
+      <div id="notificationLogsList" class="notification-logs-list">
+        <div class="empty-state">
+          <div class="empty-icon">🔕</div>
+          <p>No automated notifications dispatched yet.</p>
+          <small>Click "Test Instant Notification" or set a reminder for the current time.</small>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>MediConnect Healthcare Support Platform &bull; SRS Version 1.0 Feature #16: Recurring & Auto-Expiring Medicine Schedules</p>
+    </footer>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

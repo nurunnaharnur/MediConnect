@@ -1,0 +1,36 @@
+[
+  {
+    "id": "rem_1784643239981_sen86",
+    "medicineName": "Vitamin C 500mg",
+    "dosage": "1 Tablet Morning & Night",
+    "time": "08:00",
+    "frequency": "Twice Daily",
+    "startDate": "2026-07-21",
+    "durationDays": 14,
+    "channels": [
+      "push"
+    ],
+    "phoneNumber": "",
+    "email": "",
+    "status": "pending",
+    "lastNotifiedAt": null,
+    "createdAt": "2026-07-21T14:13:59.981Z"
+  },
+  {
+    "id": "rem_1784643242030_qn6jh",
+    "medicineName": "Amoxicillin 500mg (Past Course)",
+    "dosage": "1 Capsule 3x daily",
+    "time": "09:00",
+    "frequency": "Daily",
+    "startDate": "2026-07-01",
+    "durationDays": 7,
+    "channels": [
+      "push"
+    ],
+    "phoneNumber": "",
+    "email": "",
+    "status": "expired",
+    "lastNotifiedAt": null,
+    "createdAt": "2026-07-21T14:14:02.030Z"
+  }
+]
