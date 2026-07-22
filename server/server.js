@@ -1,7 +1,7 @@
 import 'dotenv/config'; // Loads your environment variables seamlessly in ES Modules
 import express from 'express';
 import mongoose from 'mongoose';
-
+import dns from 'node:dns';
 
 import authRoutes from './routes/authRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
@@ -9,7 +9,7 @@ import symptomRoutes from './routes/symptomRoutes.js';
 import cors from 'cors';
 
 
-
+dns.setServers(['8.8.8.8', '1.1.1.1']);
 
 
 
