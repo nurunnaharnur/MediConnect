@@ -41,6 +41,7 @@ export function calculateEndDate(startDateStr, durationDays) {
 }
 
 export function enrichCourseProgress(reminder) {
+  // Feature 16: Recurring & auto-expiring medicine schedules (tracks days passed, total duration, and checks if expired)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
@@ -75,7 +76,15 @@ export class ReminderModel {
   static async getAll() {
     if (db) {
       try {
-        const raw = await db.collection('reminders').find({}).toArray();
+        let raw = await db.collection('reminders').find({}).toArray();
+        if (raw.length === 0) {
+          const localReminders = loadReminders();
+          if (localReminders.length > 0) {
+            console.log(`Migrating ${localReminders.length} local reminders to MongoDB...`);
+            await db.collection('reminders').insertMany(localReminders);
+            raw = await db.collection('reminders').find({}).toArray();
+          }
+        }
         const enriched = [];
         for (const r of raw) {
           const item = enrichCourseProgress(r);
@@ -86,7 +95,7 @@ export class ReminderModel {
         }
         return enriched;
       } catch (err) {
-        console.error("MongoDB reminders fetch failed, falling back to local files:", err);
+        console.warn("⚠️ MongoDB is read-only or connection failed. Gracefully falling back to local files database.");
       }
     }
 
@@ -122,6 +131,8 @@ export class ReminderModel {
   }
 
   static async create(data) {
+    // Feature 13: Medicine reminder creation (dosage, time, frequency)
+    // Feature 16: Recurring & auto-expiring medicine schedules (calculates end dates)
     const startDate = data.startDate || new Date().toISOString().split('T')[0];
     const durationDays = parseInt(data.durationDays, 10) || 7;
     const endDate = calculateEndDate(startDate, durationDays);
@@ -161,6 +172,7 @@ export class ReminderModel {
   }
 
   static async updateStatus(id, newStatus, snoozeMinutes = 15) {
+    // Feature 15: Mark reminder as taken / skipped / snoozed
     let snoozeTime = null;
     if (newStatus === 'snoozed') {
       snoozeTime = new Date(Date.now() + snoozeMinutes * 60 * 1000).toISOString();

@@ -2,6 +2,8 @@ import { ReminderModel } from '../models/reminderModel.js';
 import { NotificationService } from '../services/notificationService.js';
 
 export async function createReminder(req, res) {
+  // Feature 13: Medicine reminder creation (dosage, time, frequency)
+  // Feature 16: Recurring & auto-expiring medicine schedules (duration/dates)
   try {
     const { medicineName, dosage, time, secondTime, frequency, customDays, startDate, durationDays, channels, phoneNumber, email } = req.body;
 
@@ -67,6 +69,7 @@ export async function getReminderById(req, res) {
 }
 
 export async function updateReminderStatus(req, res) {
+  // Feature 15: Mark reminder as taken / skipped / snoozed
   try {
     const { id } = req.params;
     const { status, snoozeMinutes } = req.body;

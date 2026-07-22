@@ -80,6 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   enablePushBtn.addEventListener('click', async () => {
+    // Feature 14: Automated reminder notifications (enable browser push permissions)
     if ('Notification' in window) {
       const result = await Notification.requestPermission();
       updatePushPermissionUI();
@@ -283,6 +284,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Form Submission Handler ---
   reminderForm.addEventListener('submit', async (e) => {
+    // Feature 13: Medicine reminder creation (dosage, time, frequency configuration)
+    // Feature 16: Recurring & auto-expiring medicine schedules (duration/expiry)
     e.preventDefault();
 
     const selectedChannels = [];
@@ -360,6 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- Test Instant Notification Button ---
   testNotifBtn.addEventListener('click', async () => {
+    // Feature 14: Automated reminder notifications (manual/instant notification test run)
     try {
       const res = await fetch('/api/reminders/notifications/test', {
         method: 'POST',
@@ -392,6 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Global functions for inline action buttons
   window.updateStatus = async (id, status) => {
+    // Feature 15: Mark reminder as taken / skipped / snoozed
     try {
       const res = await fetch(`/api/reminders/${id}/status`, {
         method: 'PATCH',

@@ -38,14 +38,26 @@ export class NotificationService {
   static async getLogs(limit = 50) {
     if (db) {
       try {
-        const logs = await db.collection('notifications')
+        let logs = await db.collection('notifications')
           .find({})
           .sort({ timestamp: -1 })
           .limit(limit)
           .toArray();
+        if (logs.length === 0) {
+          const localLogs = loadNotifications();
+          if (localLogs.length > 0) {
+            console.log(`Migrating ${localLogs.length} local notifications to MongoDB...`);
+            await db.collection('notifications').insertMany(localLogs);
+            logs = await db.collection('notifications')
+              .find({})
+              .sort({ timestamp: -1 })
+              .limit(limit)
+              .toArray();
+          }
+        }
         return logs;
       } catch (err) {
-        console.error("MongoDB getLogs failed, falling back to files:", err);
+        console.warn("⚠️ MongoDB is read-only or connection failed. Gracefully falling back to local notifications database.");
       }
     }
 
@@ -54,6 +66,7 @@ export class NotificationService {
   }
 
   static async dispatchNotification(reminder, channel = 'push', isTest = false) {
+    // Feature 14: Automated reminder notifications (push/SMS/email dispatch)
     const now = new Date();
     let recipient = 'Browser User';
     let detail = '';
@@ -103,6 +116,7 @@ export class NotificationService {
   }
 
   static async checkDueReminders() {
+    // Feature 16: Recurring & auto-expiring medicine schedules (verifies custom schedules and handles background check intervals)
     const reminders = await ReminderModel.getAll();
     const now = new Date();
     const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
