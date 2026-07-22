@@ -1,0 +1,282 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+.appt-page {
+  --ink: #16241F;
+  --paper: #F5F7F6;
+  --surface: #FFFFFF;
+  --rail: #D8E3E0;
+  --primary: #146356;
+  --primary-soft: #E4EFEC;
+  --booked: #146356;
+  --booked-soft: #E4EFEC;
+  --rescheduled: #A8791A;
+  --rescheduled-soft: #FBF2DF;
+  --cancelled: #C4441C;
+  --cancelled-soft: #FBEBE4;
+  --completed: #5B6B65;
+  --completed-soft: #EAEDEC;
+  --muted: #5B6B65;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 5rem;
+  box-sizing: border-box;
+}
+
+.appt-page * { box-sizing: border-box; }
+
+.appt-page .appt-shell { max-width: 760px; margin: 0 auto; }
+
+.appt-page .appt-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.appt-page .appt-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 0.35rem;
+}
+
+.appt-page h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.appt-page .appt-add-btn {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 0.7rem 1.3rem;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+.appt-page .appt-add-btn:hover { background: #0F4E44; transform: translateY(-1px); }
+
+.appt-page .appt-muted { color: var(--muted); }
+
+.appt-page .appt-error-banner {
+  background: var(--cancelled-soft);
+  color: var(--cancelled);
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-size: 0.88rem;
+  margin-bottom: 1.5rem;
+}
+
+.appt-page .appt-empty {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--muted);
+}
+.appt-page .appt-empty-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--ink);
+  margin-bottom: 0.4rem;
+}
+
+.appt-page .appt-list { display: flex; flex-direction: column; gap: 0.9rem; }
+
+.appt-page .appt-card {
+  background: var(--surface);
+  border: 1px solid #E7ECEA;
+  border-left: 4px solid var(--rail);
+  border-radius: 14px;
+  padding: 1.1rem 1.25rem;
+}
+.appt-page .appt-card.status-booked { border-left-color: var(--booked); }
+.appt-page .appt-card.status-rescheduled { border-left-color: var(--rescheduled); }
+.appt-page .appt-card.status-cancelled { border-left-color: var(--cancelled); opacity: 0.7; }
+.appt-page .appt-card.status-completed { border-left-color: var(--completed); opacity: 0.85; }
+
+.appt-page .appt-card-main {
+  display: flex;
+  align-items: center;
+  gap: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.appt-page .appt-card-date {
+  display: flex;
+  flex-direction: column;
+  min-width: 5.5rem;
+}
+.appt-page .appt-card-day {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+.appt-page .appt-card-time {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.appt-page .appt-card-info { flex: 1; min-width: 10rem; }
+.appt-page .appt-card-doctor {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+.appt-page .appt-card-dept,
+.appt-page .appt-card-reason {
+  font-size: 0.83rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+}
+
+.appt-page .appt-status-tag {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.appt-page .appt-status-tag.booked { background: var(--booked-soft); color: var(--booked); }
+.appt-page .appt-status-tag.rescheduled { background: var(--rescheduled-soft); color: var(--rescheduled); }
+.appt-page .appt-status-tag.cancelled { background: var(--cancelled-soft); color: var(--cancelled); }
+.appt-page .appt-status-tag.completed { background: var(--completed-soft); color: var(--completed); }
+
+.appt-page .appt-card-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.appt-page .appt-reschedule-form {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--rail);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+/* ---------- Buttons ---------- */
+.appt-page .appt-btn-secondary,
+.appt-page .appt-btn-primary,
+.appt-page .appt-btn-danger {
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.appt-page .appt-btn-secondary {
+  background: transparent;
+  border-color: #DDE4E2;
+  color: var(--muted);
+}
+.appt-page .appt-btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.appt-page .appt-btn-primary:disabled,
+.appt-page .appt-btn-danger:disabled,
+.appt-page .appt-btn-secondary:disabled { opacity: 0.6; cursor: not-allowed; }
+.appt-page .appt-btn-danger {
+  background: var(--cancelled-soft);
+  color: var(--cancelled);
+  border-color: var(--cancelled-soft);
+}
+.appt-page .appt-btn-danger:hover { background: #f7ddd2; }
+
+/* ---------- Form panel / overlay ---------- */
+.appt-page .appt-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(22, 36, 31, 0.35);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 3rem 1rem;
+  z-index: 20;
+}
+
+.appt-page .appt-form-card {
+  background: var(--surface);
+  border-radius: 18px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 20px 50px rgba(22, 36, 31, 0.18);
+}
+.appt-page .appt-form-card h2 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.3rem;
+  margin: 0 0 1.25rem;
+}
+
+.appt-page .appt-field {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.appt-page .appt-field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.appt-page .appt-field input,
+.appt-page .appt-field textarea {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  border: 1px solid #DDE4E2;
+  background: var(--paper);
+  color: var(--ink);
+}
+.appt-page .appt-field input:focus,
+.appt-page .appt-field textarea:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  background: #fff;
+}
+.appt-page .appt-field textarea { min-height: 4.5rem; resize: vertical; }
+
+.appt-page .appt-field-row { display: flex; gap: 0.75rem; }
+.appt-page .appt-field-row .appt-field { flex: 1; }
+
+.appt-page .appt-form-error {
+  color: var(--cancelled);
+  font-size: 0.85rem;
+  margin: 0 0 0.75rem;
+}
+
+.appt-page .appt-form-actions,
+.appt-page .appt-reschedule-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+@media (max-width: 520px) {
+  .appt-page .appt-field-row { flex-direction: column; gap: 1rem; }
+  .appt-page .appt-card-main { align-items: flex-start; }
+}
