@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Reminders from './pages/Reminders';
+import SymptomChecker from './pages/SymptomChecker';
 import { getToken } from './api/authApi';
 
 // Simple guard: redirect to /login if there's no token yet.
@@ -25,6 +26,14 @@ function App() {
             </RequireAuth>
           }
         />
+        <Route
+     path="/symptom-checker"
+     element={
+       <RequireAuth>
+         <SymptomChecker />
+       </RequireAuth>
+     }
+   />
       </Routes>
     </BrowserRouter>
   );
