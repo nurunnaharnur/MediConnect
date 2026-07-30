@@ -5,6 +5,8 @@ import dotenv from 'dotenv';
 import homeRoutes from './routes/homeRoutes.js';
 import authRoutes from './routes/authRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
+import symptomRoutes from './routes/symptomRoutes.js';
+import healthRoutes from './routes/healthRoutes.js';
 import { NotificationService } from './services/notificationService.js';
 import { connectDB } from './config/db.js';
 
@@ -27,6 +29,8 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use('/api/home', homeRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/reminders', reminderRoutes);
+app.use('/api/symptoms', symptomRoutes);
+app.use('/api/health', healthRoutes);
 
 app.listen(PORT, '0.0.0.0', async () => {
   console.log(`MediConnect Server running on http://localhost:${PORT}`);

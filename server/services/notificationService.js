@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ReminderModel } from '../models/reminderModel.js';
-import { db } from '../config/db.js';
+import { getDB } from '../config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +36,7 @@ export function saveNotifications(notifications) {
 
 export class NotificationService {
   static async getLogs(limit = 50) {
+    const db = await getDB();
     if (db) {
       try {
         let logs = await db.collection('notifications')
@@ -99,6 +100,7 @@ export class NotificationService {
 
     console.log(`🔔 AUTOMATED NOTIFICATION DELIVERED [${channel.toUpperCase()}]:`, detail);
 
+    const db = await getDB();
     if (db) {
       try {
         await db.collection('notifications').insertOne(notificationRecord);

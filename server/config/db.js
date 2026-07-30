@@ -3,7 +3,11 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const uri = process.env.MONGODB_URI;
+let uri = process.env.MONGODB_URI;
+if (uri && uri.includes('directConnection=true')) {
+  console.log("⚠️ Auto-correcting MONGODB_URI: directConnection=true replaced with false to allow database writes.");
+  uri = uri.replace('directConnection=true', 'directConnection=false');
+}
 
 // Detect whether the URI uses the SRV format or the standard format
 const isSRV = uri && uri.startsWith('mongodb+srv://');
@@ -40,5 +44,21 @@ export async function connectDB() {
     console.error("🔴 MongoDB Connection Failed:", error);
     // Don't kill the server process immediately on initial failure to allow configuration correction
     console.warn("Continuing server start in fallback/offline mode.");
+    return null;
   }
 }
+
+export async function getDB() {
+  if (db) return db;
+  try {
+    console.log("🔄 Re-attempting connection to MongoDB...");
+    await client.connect();
+    db = client.db();
+    console.log("🟢 On-demand connection successful!");
+    return db;
+  } catch (error) {
+    console.error("🔴 On-demand MongoDB Connection Failed:", error);
+    return null;
+  }
+}
+

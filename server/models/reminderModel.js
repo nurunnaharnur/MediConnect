@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { db } from '../config/db.js';
+import { getDB } from '../config/db.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -74,6 +74,7 @@ export function enrichCourseProgress(reminder) {
 
 export class ReminderModel {
   static async getAll() {
+    const db = await getDB();
     if (db) {
       try {
         let raw = await db.collection('reminders').find({}).toArray();
@@ -118,6 +119,7 @@ export class ReminderModel {
   }
 
   static async getById(id) {
+    const db = await getDB();
     if (db) {
       try {
         const reminder = await db.collection('reminders').findOne({ id });
@@ -156,6 +158,7 @@ export class ReminderModel {
       createdAt: new Date().toISOString()
     };
 
+    const db = await getDB();
     if (db) {
       try {
         await db.collection('reminders').insertOne(newReminder);
@@ -178,6 +181,7 @@ export class ReminderModel {
       snoozeTime = new Date(Date.now() + snoozeMinutes * 60 * 1000).toISOString();
     }
 
+    const db = await getDB();
     if (db) {
       try {
         const updateDoc = {
@@ -213,6 +217,7 @@ export class ReminderModel {
   }
 
   static async updateNotificationTime(id, isoTimestamp) {
+    const db = await getDB();
     if (db) {
       try {
         const updateDoc = {
@@ -246,6 +251,7 @@ export class ReminderModel {
   }
 
   static async delete(id) {
+    const db = await getDB();
     if (db) {
       try {
         const res = await db.collection('reminders').deleteOne({ id });

@@ -1,36 +1,26 @@
 [
   {
-    "id": "rem_1784643239981_sen86",
-    "medicineName": "Vitamin C 500mg",
-    "dosage": "1 Tablet Morning & Night",
-    "time": "08:00",
-    "frequency": "Twice Daily",
-    "startDate": "2026-07-21",
-    "durationDays": 14,
-    "channels": [
-      "push"
-    ],
-    "phoneNumber": "",
-    "email": "",
-    "status": "pending",
-    "lastNotifiedAt": null,
-    "createdAt": "2026-07-21T14:13:59.981Z"
-  },
-  {
-    "id": "rem_1784643242030_qn6jh",
-    "medicineName": "Amoxicillin 500mg (Past Course)",
-    "dosage": "1 Capsule 3x daily",
-    "time": "09:00",
+    "id": "rem_1785416625407_32bx2",
+    "medicineName": "LSD",
+    "dosage": "4mg per day",
+    "time": "19:04",
+    "secondTime": "",
     "frequency": "Daily",
-    "startDate": "2026-07-01",
+    "customDays": [],
+    "startDate": "2026-07-30",
     "durationDays": 7,
+    "endDate": "2026-08-06",
     "channels": [
-      "push"
+      "push",
+      "sms",
+      "email"
     ],
-    "phoneNumber": "",
-    "email": "",
-    "status": "expired",
-    "lastNotifiedAt": null,
-    "createdAt": "2026-07-21T14:14:02.030Z"
+    "phoneNumber": "+1 (555) 019-2834",
+    "email": "patient@mediconnect.health",
+    "status": "taken",
+    "lastNotifiedAt": "2026-07-30T13:04:07.474Z",
+    "createdAt": "2026-07-30T13:03:45.407Z",
+    "_id": "6a6b4bb1f35eb580ccd1c13b",
+    "updatedAt": "2026-07-30T13:04:54.416Z"
   }
 ]
