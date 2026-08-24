@@ -21,12 +21,14 @@ async function request(endpoint, payload) {
     throw new Error(data.message || 'Something went wrong. Please try again.');
   }
 
-  return data; // { _id, name, email, token }
+  return data; // { _id, name, email, role, token }
 }
 
 /**
  * @param {{ name: string, email: string, password: string, age?: number,
- *   gender?: string, height?: number, weight?: number, medicalHistory?: string }} payload
+ *   gender?: string, height?: number, weight?: number, medicalHistory?: string,
+ *   role?: 'patient' | 'doctor', specialization?: string, qualification?: string,
+ *   licenseNumber?: string }} payload
  */
 export const registerUser = (payload) => request('/auth/register', payload);
 
@@ -40,11 +42,25 @@ export const saveSession = (data) => {
   localStorage.setItem('mc_token', data.token);
   localStorage.setItem(
     'mc_user',
-    JSON.stringify({ _id: data._id, name: data.name, email: data.email })
+    JSON.stringify({ _id: data._id, name: data.name, email: data.email, role: data.role || 'patient' })
   );
 };
 
 export const getToken = () => localStorage.getItem('mc_token');
+
+// Returns the cached user object saved at login/register time, or null.
+// Falls back to role 'patient' for sessions saved before roles existed.
+export const getUser = () => {
+  const raw = localStorage.getItem('mc_user');
+  if (!raw) return null;
+  try {
+    const user = JSON.parse(raw);
+    return { ...user, role: user.role || 'patient' };
+  } catch {
+    return null;
+  }
+};
+
 export const clearSession = () => {
   localStorage.removeItem('mc_token');
   localStorage.removeItem('mc_user');

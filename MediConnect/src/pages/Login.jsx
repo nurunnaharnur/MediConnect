@@ -20,7 +20,7 @@ export default function Login() {
     try {
       const data = await loginUser(form);
       saveSession(data);
-      navigate('/dashboard');
+      navigate(data.role === 'doctor' ? '/doctor/reports' : '/dashboard');
     } catch (err) {
       setError(err.message);
     } finally {

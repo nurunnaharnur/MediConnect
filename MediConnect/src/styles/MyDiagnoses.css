@@ -1,0 +1,60 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+.diag-page {
+  --ink: #16241F;
+  --paper: #F5F7F6;
+  --surface: #FFFFFF;
+  --rail: #D8E3E0;
+  --primary: #146356;
+  --primary-soft: #E4EFEC;
+  --muted: #5B6B65;
+  --danger: #C4441C;
+  --danger-soft: #FBEBE4;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 5rem;
+  box-sizing: border-box;
+}
+.diag-page * { box-sizing: border-box; }
+.diag-page .diag-shell { max-width: 760px; margin: 0 auto; }
+.diag-page .diag-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 0.35rem;
+}
+.diag-page h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700; margin: 0 0 1.75rem; }
+.diag-page .diag-muted { color: var(--muted); }
+.diag-page .diag-error-banner {
+  background: var(--danger-soft); color: var(--danger); border-radius: 12px; padding: 0.8rem 1rem;
+  font-size: 0.88rem; margin-bottom: 1.5rem;
+}
+.diag-page .diag-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.diag-page .diag-empty-title {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.1rem; color: var(--ink); margin-bottom: 0.4rem;
+}
+
+.diag-page .diag-list { display: flex; flex-direction: column; gap: 1rem; }
+.diag-page .diag-card { background: var(--surface); border: 1px solid #E7ECEA; border-radius: 14px; padding: 1.25rem; }
+.diag-page .diag-card-header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.9rem; }
+.diag-page .diag-card-doctor { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+.diag-page .diag-card-date { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+
+.diag-page .diag-section-title {
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+  color: var(--muted); margin: 0.9rem 0 0.3rem;
+}
+.diag-page .diag-text { margin: 0; font-size: 0.92rem; line-height: 1.5; }
+
+.diag-page .diag-medicine-table { display: flex; flex-direction: column; gap: 0.4rem; }
+.diag-page .diag-medicine-row {
+  display: grid; grid-template-columns: 1.2fr 0.9fr 0.9fr 0.9fr 1.4fr; gap: 0.6rem;
+  background: var(--primary-soft); border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 0.85rem; align-items: center;
+}
+.diag-page .diag-medicine-name { font-weight: 600; }
+.diag-page .diag-medicine-instructions { color: var(--muted); font-size: 0.8rem; }
+
+@media (max-width: 640px) {
+  .diag-page .diag-medicine-row { grid-template-columns: 1fr 1fr; row-gap: 0.2rem; }
+}

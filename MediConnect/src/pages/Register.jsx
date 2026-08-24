@@ -12,6 +12,10 @@ const initialForm = {
   height: '',
   weight: '',
   medicalHistory: '',
+  role: 'patient',
+  specialization: '',
+  qualification: '',
+  licenseNumber: '',
 };
 
 export default function Register() {
@@ -19,6 +23,8 @@ export default function Register() {
   const [form, setForm] = useState(initialForm);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const isDoctor = form.role === 'doctor';
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -37,7 +43,7 @@ export default function Register() {
       };
       const data = await registerUser(payload);
       saveSession(data);
-      navigate('/dashboard');
+      navigate(data.role === 'doctor' ? '/doctor/reports' : '/dashboard');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -76,11 +82,27 @@ export default function Register() {
         <div className="auth-card">
           <h1 className="auth-heading">Create your account</h1>
           <p className="auth-subheading">
-            A few details help us personalize your reminders.
+            A few details help us personalize your experience.
           </p>
 
           <form className="auth-form" onSubmit={handleSubmit}>
             {error && <div className="auth-error">{error}</div>}
+
+            <div className="auth-field">
+              <label className="auth-label" htmlFor="role">
+                I am a
+              </label>
+              <select
+                id="role"
+                name="role"
+                className="auth-select"
+                value={form.role}
+                onChange={handleChange}
+              >
+                <option value="patient">Patient</option>
+                <option value="doctor">Doctor</option>
+              </select>
+            </div>
 
             <div className="auth-field">
               <label className="auth-label" htmlFor="name">
@@ -130,89 +152,143 @@ export default function Register() {
               />
             </div>
 
-            <div className="auth-row">
-              <div className="auth-field">
-                <label className="auth-label" htmlFor="age">
-                  Age
-                </label>
-                <input
-                  id="age"
-                  name="age"
-                  type="number"
-                  min="0"
-                  className="auth-input"
-                  placeholder="28"
-                  value={form.age}
-                  onChange={handleChange}
-                />
-              </div>
+            {isDoctor ? (
+              <>
+                <div className="auth-field">
+                  <label className="auth-label" htmlFor="specialization">
+                    Specialization
+                  </label>
+                  <input
+                    id="specialization"
+                    name="specialization"
+                    type="text"
+                    className="auth-input"
+                    placeholder="Gynecology"
+                    value={form.specialization}
+                    onChange={handleChange}
+                    required
+                  />
+                </div>
 
-              <div className="auth-field">
-                <label className="auth-label" htmlFor="gender">
-                  Gender
-                </label>
-                <select
-                  id="gender"
-                  name="gender"
-                  className="auth-select"
-                  value={form.gender}
-                  onChange={handleChange}
-                >
-                  <option value="">Select</option>
-                  <option value="Female">Female</option>
-                  <option value="Male">Male</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-            </div>
+                <div className="auth-row">
+                  <div className="auth-field">
+                    <label className="auth-label" htmlFor="qualification">
+                      Qualification (optional)
+                    </label>
+                    <input
+                      id="qualification"
+                      name="qualification"
+                      type="text"
+                      className="auth-input"
+                      placeholder="MBBS, FCPS"
+                      value={form.qualification}
+                      onChange={handleChange}
+                    />
+                  </div>
 
-            <div className="auth-row">
-              <div className="auth-field">
-                <label className="auth-label" htmlFor="height">
-                  Height (cm)
-                </label>
-                <input
-                  id="height"
-                  name="height"
-                  type="number"
-                  min="0"
-                  className="auth-input"
-                  placeholder="165"
-                  value={form.height}
-                  onChange={handleChange}
-                />
-              </div>
+                  <div className="auth-field">
+                    <label className="auth-label" htmlFor="licenseNumber">
+                      License number (optional)
+                    </label>
+                    <input
+                      id="licenseNumber"
+                      name="licenseNumber"
+                      type="text"
+                      className="auth-input"
+                      placeholder="BMDC-12345"
+                      value={form.licenseNumber}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="auth-row">
+                  <div className="auth-field">
+                    <label className="auth-label" htmlFor="age">
+                      Age
+                    </label>
+                    <input
+                      id="age"
+                      name="age"
+                      type="number"
+                      min="0"
+                      className="auth-input"
+                      placeholder="28"
+                      value={form.age}
+                      onChange={handleChange}
+                    />
+                  </div>
 
-              <div className="auth-field">
-                <label className="auth-label" htmlFor="weight">
-                  Weight (kg)
-                </label>
-                <input
-                  id="weight"
-                  name="weight"
-                  type="number"
-                  min="0"
-                  className="auth-input"
-                  placeholder="60"
-                  value={form.weight}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
+                  <div className="auth-field">
+                    <label className="auth-label" htmlFor="gender">
+                      Gender
+                    </label>
+                    <select
+                      id="gender"
+                      name="gender"
+                      className="auth-select"
+                      value={form.gender}
+                      onChange={handleChange}
+                    >
+                      <option value="">Select</option>
+                      <option value="Female">Female</option>
+                      <option value="Male">Male</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                </div>
 
-            <div className="auth-field">
-              <label className="auth-label" htmlFor="medicalHistory">
-                Medical history (optional)
-              </label>
-              <textarea
-                id="medicalHistory"
-                name="medicalHistory"
-                className="auth-textarea"
-                placeholder="Any conditions, allergies, or medications we should know about"
-                value={form.medicalHistory}
-                onChange={handleChange}
-              />
-            </div>
+                <div className="auth-row">
+                  <div className="auth-field">
+                    <label className="auth-label" htmlFor="height">
+                      Height (cm)
+                    </label>
+                    <input
+                      id="height"
+                      name="height"
+                      type="number"
+                      min="0"
+                      className="auth-input"
+                      placeholder="165"
+                      value={form.height}
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <div className="auth-field">
+                    <label className="auth-label" htmlFor="weight">
+                      Weight (kg)
+                    </label>
+                    <input
+                      id="weight"
+                      name="weight"
+                      type="number"
+                      min="0"
+                      className="auth-input"
+                      placeholder="60"
+                      value={form.weight}
+                      onChange={handleChange}
+                    />
+                  </div>
+                </div>
+
+                <div className="auth-field">
+                  <label className="auth-label" htmlFor="medicalHistory">
+                    Medical history (optional)
+                  </label>
+                  <textarea
+                    id="medicalHistory"
+                    name="medicalHistory"
+                    className="auth-textarea"
+                    placeholder="Any conditions, allergies, or medications we should know about"
+                    value={form.medicalHistory}
+                    onChange={handleChange}
+                  />
+                </div>
+              </>
+            )}
 
             <button className="auth-button" type="submit" disabled={loading}>
               {loading ? 'Creating account…' : 'Create account'}
