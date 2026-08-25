@@ -1160,8 +1160,62 @@
   margin: 0.2rem 0 0;
 }
 
+/* Health Profile PDF & Printable Strip */
+.dash-profile-pdf-strip {
+  background: linear-gradient(135deg, #F0FDF4 0%, #E6F4F1 100%);
+  border: 1.5px solid #A7F3D0;
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dash-pdf-strip-info {
+  flex: 1;
+}
+
+.dash-pdf-strip-buttons {
+  display: flex;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.dash-btn-pdf-download {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: var(--primary);
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 4px 12px rgba(20, 99, 86, 0.2);
+  transition: all 0.15s ease;
+}
+
+.dash-btn-pdf-download:hover {
+  background: #0E493F;
+  transform: translateY(-1px);
+}
+
+.dash-btn-pdf-download:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .dash-profile-pdf-strip {
+    flex-direction: column;
+    align-items: flex-start;
+  }
   .dash-hero {
     flex-direction: column;
     align-items: flex-start;

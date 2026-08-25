@@ -7,7 +7,8 @@ import {
   getMe,
   updateEmergencyContact,
   sendEmergencyAlert,
-  getHealthTips
+  getHealthTips,
+  exportComprehensiveHealthProfilePDF
 } from '../controllers/authController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -24,5 +25,6 @@ router.get('/me', protect, getMe);
 router.put('/emergency-contact', protect, updateEmergencyContact);
 router.post('/emergency-alert', protect, sendEmergencyAlert);
 router.get('/health-tips', protect, getHealthTips);
+router.get('/health-profile/pdf', protect, exportComprehensiveHealthProfilePDF);
 
 export default router;

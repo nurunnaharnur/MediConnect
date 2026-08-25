@@ -90,3 +90,28 @@ export const sendEmergencyAlert = (payload) => authRequest('/auth/emergency-aler
 
 // Personalized Health Tips
 export const fetchPersonalizedHealthTips = () => authRequest('/auth/health-tips', null, 'GET');
+
+// Download Full Patient Health Record & Profile PDF
+export const downloadComprehensiveHealthProfilePDF = async (userName = 'Patient') => {
+  const token = getToken();
+  const res = await fetch(`${API_BASE}/auth/health-profile/pdf`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.message || 'Failed to download health profile PDF.');
+  }
+
+  const blob = await res.blob();
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `MediConnect_Health_Profile_${userName.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.URL.revokeObjectURL(url);
+};

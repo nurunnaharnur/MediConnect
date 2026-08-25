@@ -1,8 +1,14 @@
 import User from '../models/User.js';
 import MedicineReminder from '../models/MedicineReminder.js';
+import MoodEntry from '../models/MoodEntry.js';
+import WellbeingCheckin from '../models/WellbeingCheckin.js';
+import CycleEntry from '../models/CycleEntry.js';
+import Appointment from '../models/Appointment.js';
+import Diagnosis from '../models/Diagnosis.js';
 import jwt from 'jsonwebtoken';
 import { generatePersonalizedTips } from '../services/tipsService.js';
 import { sendEmergencyAlertEmail } from '../services/notificationService.js';
+import { streamComprehensiveHealthProfilePDF } from '../utils/pdfGenerator.js';
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'mediconnect-secret', { expiresIn: '30d' });
@@ -273,5 +279,75 @@ export const getHealthTips = async (req, res) => {
   } catch (error) {
     console.error('Error generating health tips:', error);
     res.status(500).json({ message: error.message || 'Failed to generate personalized health tips.' });
+  }
+};
+
+// @desc    Generate & Stream Comprehensive Patient Health Profile PDF
+// @route   GET /api/auth/health-profile/pdf
+export const exportComprehensiveHealthProfilePDF = async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id).select('-password');
+    if (!user) return res.status(404).json({ message: 'Patient profile not found.' });
+
+    // Parallel fetch of all patient records
+    const [medications, moodEntries, screenings, cycleRecord, appointments, diagnoses] = await Promise.all([
+      MedicineReminder.find({ patientId: user._id }).sort({ createdAt: -1 }),
+      MoodEntry.find({ patientId: user._id }).sort({ entryDate: -1 }).limit(10),
+      WellbeingCheckin.find({ patientId: user._id }).sort({ completedAt: -1 }).limit(10),
+      CycleEntry.findOne({ patientId: user._id }),
+      Appointment.find({ patientId: user._id }).sort({ date: -1 }),
+      Diagnosis.find({ patientId: user._id }).sort({ createdAt: -1 })
+    ]);
+
+    // Compute cycle metrics if cycle record exists
+    let cycleData = null;
+    if (cycleRecord) {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const start = new Date(cycleRecord.lastPeriodStart);
+      start.setHours(0, 0, 0, 0);
+      const diffDays = Math.max(0, Math.floor((today - start) / (1000 * 60 * 60 * 24)));
+      const cycleLength = cycleRecord.cycleLength || 28;
+      const periodDuration = cycleRecord.periodDuration || 5;
+      const currentCycleDay = (diffDays % cycleLength) + 1;
+      const nextPeriodMs = start.getTime() + (Math.floor(diffDays / cycleLength) + 1) * cycleLength * 86400000;
+      const nextPeriodDate = new Date(nextPeriodMs);
+      const daysUntilNext = Math.max(0, Math.ceil((nextPeriodDate - today) / 86400000));
+
+      let phase = 'Follicular Phase';
+      if (currentCycleDay <= periodDuration) phase = 'Menstrual Phase';
+      else if (currentCycleDay >= cycleLength - 14 - 5 && currentCycleDay <= cycleLength - 14 + 1) phase = 'Ovulation Window';
+      else if (currentCycleDay > cycleLength - 14 + 1) phase = 'Luteal Phase';
+
+      cycleData = {
+        phase,
+        currentCycleDay,
+        cycleLength,
+        periodDuration,
+        nextPeriodDate,
+        daysUntilNext
+      };
+    }
+
+    const sanitizedFileName = `MediConnect_Health_Profile_${user.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename="${sanitizedFileName}"`);
+
+    streamComprehensiveHealthProfilePDF(
+      {
+        user,
+        medications,
+        moodEntries,
+        screenings,
+        cycleData,
+        appointments,
+        diagnoses,
+        generatedAt: new Date()
+      },
+      res
+    );
+  } catch (error) {
+    console.error('Error generating full health profile PDF:', error);
+    res.status(500).json({ message: error.message || 'Failed to generate health profile PDF.' });
   }
 };

@@ -8,6 +8,7 @@ import {
   sendEmergencyAlert,
   fetchPersonalizedHealthTips,
   saveSession,
+  downloadComprehensiveHealthProfilePDF,
 } from '../api/authApi';
 import { fetchReminders } from '../api/reminderApi';
 import {
@@ -106,6 +107,7 @@ export default function Dashboard() {
   });
   const [cycleTab, setCycleTab] = useState('insights'); // 'insights', 'log', 'settings'
   const [savingCycle, setSavingCycle] = useState(false);
+  const [downloadingProfilePdf, setDownloadingProfilePdf] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -333,6 +335,21 @@ export default function Dashboard() {
       alert(err.message || 'Failed to record cycle symptom.');
     } finally {
       setSavingCycle(false);
+    }
+  }
+
+  async function handleDownloadHealthProfilePDF() {
+    setDownloadingProfilePdf(true);
+    try {
+      await downloadComprehensiveHealthProfilePDF(user?.name || 'Patient');
+      setAlertFeedback({
+        text: '📄 Comprehensive Patient Health Profile PDF generated and downloaded.',
+        isError: false,
+      });
+    } catch (err) {
+      alert(err.message || 'Failed to download health profile PDF.');
+    } finally {
+      setDownloadingProfilePdf(false);
     }
   }
 
@@ -1094,16 +1111,44 @@ export default function Dashboard() {
       {/* ==================== HEALTH PROFILE & VITALS MODAL ==================== */}
       {activeModal === 'profile' && (
         <div className="dash-modal-overlay" onClick={() => setActiveModal(null)}>
-          <div className="dash-modal-card" onClick={(e) => e.stopPropagation()}>
+          <div className="dash-modal-card" style={{ maxWidth: '640px' }} onClick={(e) => e.stopPropagation()}>
             <div className="dash-modal-header">
-              <h3>📊 Patient Health Profile & Vitals</h3>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                <span style={{ fontSize: '1.6rem' }}>📊</span>
+                <div>
+                  <h3 style={{ margin: 0 }}>Patient Health Profile & Records</h3>
+                  <span style={{ fontSize: '0.78rem', color: '#5B6B65' }}>
+                    Comprehensive demographics, vitals, prescriptions, and clinical history
+                  </span>
+                </div>
+              </div>
               <button className="dash-modal-close" onClick={() => setActiveModal(null)}>
                 ✕
               </button>
             </div>
 
-            <div className="dash-profile-body" style={{ marginTop: '1.25rem' }}>
-              <div className="dash-profile-grid">
+            <div className="dash-profile-body" style={{ marginTop: '1rem' }}>
+              {/* PDF & Printable Action Strip */}
+              <div className="dash-profile-pdf-strip">
+                <div className="dash-pdf-strip-info">
+                  <strong style={{ color: '#0F4E44', fontSize: '0.95rem' }}>📄 Official Printable PDF Record</strong>
+                  <p style={{ margin: '0.2rem 0 0', fontSize: '0.82rem', color: '#374151' }}>
+                    Export all patient data (vitals, medications, mood screenings, cycle tracking, appointments & doctor diagnoses) into a clean, printable clinical PDF report.
+                  </p>
+                </div>
+                <div className="dash-pdf-strip-buttons">
+                  <button
+                    type="button"
+                    className="dash-btn-pdf-download"
+                    onClick={handleDownloadHealthProfilePDF}
+                    disabled={downloadingProfilePdf}
+                  >
+                    {downloadingProfilePdf ? 'Generating PDF…' : '📥 Download Printable PDF'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="dash-profile-grid" style={{ marginTop: '1.25rem' }}>
                 <div>
                   <strong>Full Name:</strong> {user?.name || '—'}
                 </div>
@@ -1121,6 +1166,15 @@ export default function Dashboard() {
                 </div>
                 <div>
                   <strong>Weight:</strong> {user?.weight ? `${user.weight} kg` : '—'}
+                </div>
+                <div>
+                  <strong>Calculated BMI:</strong>{' '}
+                  {user?.height && user?.weight && user.height > 0
+                    ? `${(user.weight / ((user.height / 100) * (user.height / 100))).toFixed(1)} kg/m²`
+                    : '—'}
+                </div>
+                <div>
+                  <strong>Active Prescriptions:</strong> {reminders.length} registered
                 </div>
               </div>
 
@@ -1142,7 +1196,16 @@ export default function Dashboard() {
                 </p>
               </div>
 
-              <div className="dash-modal-actions" style={{ marginTop: '1.5rem' }}>
+              <div className="dash-modal-actions" style={{ marginTop: '1.5rem', display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+                <button
+                  type="button"
+                  className="dash-btn-pdf-download"
+                  onClick={handleDownloadHealthProfilePDF}
+                  disabled={downloadingProfilePdf}
+                  style={{ marginRight: 'auto' }}
+                >
+                  {downloadingProfilePdf ? 'Generating PDF…' : '📄 Export Printable PDF'}
+                </button>
                 <button
                   className="dash-btn-secondary"
                   onClick={() => {
