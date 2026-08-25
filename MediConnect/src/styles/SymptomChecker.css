@@ -4,17 +4,30 @@
   font-family: 'Inter', system-ui, sans-serif;
   background: #F8FAFA;
   min-height: 100vh;
-  padding: 2.5rem 1.5rem 5rem;
+  padding: 2rem 1.25rem 5rem;
   color: #16241F;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.sym-page *,
+.sym-page *::before,
+.sym-page *::after {
   box-sizing: border-box;
 }
 
-.sym-page * { box-sizing: border-box; }
-.sym-shell { max-width: 1180px; margin: 0 auto; }
+.sym-shell {
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  min-width: 0;
+}
 
 /* Top Header */
 .sym-header {
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  width: 100%;
 }
 
 .sym-eyebrow {
@@ -24,20 +37,21 @@
   text-transform: uppercase;
   color: #146356;
   font-weight: 600;
-  margin: 0 0 0.4rem;
+  margin: 0 0 0.35rem;
 }
 
 .sym-header h1 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 2.2rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin: 0 0 0.5rem;
+  margin: 0 0 0.4rem;
   color: #16241F;
+  line-height: 1.25;
 }
 
 .sym-subtext {
   color: #5B6B65;
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   margin: 0;
   line-height: 1.5;
   max-width: 820px;
@@ -47,18 +61,21 @@
 .sym-presets-bar {
   background: #FFFFFF;
   border: 1px solid #E7ECEA;
-  border-radius: 18px;
-  padding: 1rem 1.25rem;
-  margin-bottom: 1.75rem;
+  border-radius: 16px;
+  padding: 0.85rem 1.15rem;
+  margin-bottom: 1.5rem;
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   flex-wrap: wrap;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
 }
 
 .sym-presets-label {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-family: 'IBM Plex Mono', monospace;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -72,9 +89,9 @@
   border: 1px solid #DDE4E2;
   color: #16241F;
   font-family: 'Inter', sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  padding: 0.35rem 0.85rem;
+  padding: 0.3rem 0.75rem;
   border-radius: 999px;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -89,13 +106,15 @@
 
 /* Banners */
 .sym-banner {
-  padding: 0.85rem 1.25rem;
-  border-radius: 14px;
-  margin-bottom: 1.5rem;
-  font-size: 0.9rem;
+  padding: 0.75rem 1.15rem;
+  border-radius: 12px;
+  margin-bottom: 1.25rem;
+  font-size: 0.88rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  max-width: 100%;
 }
 
 .sym-banner-error {
@@ -118,39 +137,52 @@
   color: inherit;
 }
 
-/* Two-Column Layout */
+/* Two-Column Grid Layout (strictly contained) */
 .sym-layout {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 1.75rem;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 1.5rem;
   align-items: start;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.sym-layout > * {
+  min-width: 0;
+  max-width: 100%;
 }
 
 /* Base Card */
 .sym-card {
   background: #FFFFFF;
-  border-radius: 24px;
+  border-radius: 20px;
   border: 1px solid #E7ECEA;
-  padding: 1.75rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sym-card-top-bar {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
+  gap: 0.5rem;
 }
 
 .sym-card h3 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.25rem;
-  margin: 0 0 0.25rem;
+  font-size: 1.18rem;
+  margin: 0 0 0.2rem;
   color: #16241F;
 }
 
 .sym-hint {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   color: #5B6B65;
   margin: 0;
 }
@@ -159,11 +191,12 @@
   background: transparent;
   border: none;
   color: #DC2626;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-weight: 700;
   cursor: pointer;
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   border-radius: 6px;
+  white-space: nowrap;
 }
 
 .sym-btn-text-danger:hover {
@@ -174,20 +207,22 @@
 .sym-selected-tray {
   background: #F0FDF4;
   border: 1px solid #BBF7D0;
-  border-radius: 14px;
-  padding: 0.85rem 1rem;
-  margin-bottom: 1.25rem;
+  border-radius: 12px;
+  padding: 0.75rem 0.9rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .sym-tray-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.4rem;
 }
 
 .sym-tray-title {
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-family: 'IBM Plex Mono', monospace;
   text-transform: uppercase;
   color: #166534;
@@ -197,27 +232,29 @@
 .sym-tray-chips {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.4rem;
+  gap: 0.35rem;
+  width: 100%;
 }
 
 .sym-tray-tag {
   background: #FFFFFF;
   border: 1px solid #86EFAC;
   color: #14532D;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
-  padding: 0.25rem 0.65rem;
+  padding: 0.2rem 0.55rem;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.3rem;
+  max-width: 100%;
 }
 
 .sym-tag-remove {
   background: transparent;
   border: none;
   color: #DC2626;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   cursor: pointer;
   padding: 0;
   display: flex;
@@ -226,15 +263,17 @@
 
 /* Search Box */
 .sym-search-wrap {
-  margin-bottom: 1rem;
+  margin-bottom: 0.85rem;
+  width: 100%;
 }
 
 .sym-search-input {
   width: 100%;
+  max-width: 100%;
   font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  padding: 0.75rem 1rem;
-  border-radius: 14px;
+  font-size: 0.88rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 12px;
   border: 1px solid #DDE4E2;
   background: #F8FAFA;
   color: #16241F;
@@ -248,24 +287,28 @@
 /* Category Filter Tabs */
 .sym-cat-pills {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.35rem;
   overflow-x: auto;
-  padding-bottom: 0.6rem;
-  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 0.85rem;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .sym-cat-pill {
   font-family: 'Inter', sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   background: #F1F4F3;
   color: #5B6B65;
   border: 1px solid transparent;
-  padding: 0.45rem 0.85rem;
+  padding: 0.35rem 0.75rem;
   border-radius: 999px;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.15s ease;
+  flex-shrink: 0;
 }
 
 .sym-cat-pill:hover {
@@ -281,32 +324,36 @@
 /* Checklist Grid */
 .sym-checklist-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 0.6rem;
-  max-height: 400px;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  gap: 0.5rem;
+  max-height: 380px;
   overflow-y: auto;
-  padding-right: 0.35rem;
+  padding-right: 0.25rem;
+  width: 100%;
+  min-width: 0;
 }
 
 .sym-chip-btn {
   font-family: 'Inter', sans-serif;
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  padding: 0.75rem 0.9rem;
-  border-radius: 14px;
+  gap: 0.55rem;
+  padding: 0.65rem 0.75rem;
+  border-radius: 12px;
   border: 1px solid #E5EAE8;
   background: #FFFFFF;
   color: #374151;
   cursor: pointer;
   transition: all 0.15s ease;
   text-align: left;
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sym-chip-btn:hover {
   background: #F1F7F5;
   border-color: #146356;
-  transform: translateY(-1px);
 }
 
 .sym-chip-btn.selected {
@@ -314,42 +361,51 @@
   color: #0F4E44;
   border-color: #146356;
   font-weight: 600;
-  box-shadow: 0 2px 8px rgba(20, 99, 86, 0.12);
 }
 
 .sym-chip-icon {
-  font-size: 1.25rem;
+  font-size: 1.15rem;
+  flex-shrink: 0;
 }
 
 .sym-chip-body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .sym-chip-title {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  line-height: 1.3;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sym-chip-cat {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: #5B6B65;
-  margin-top: 0.15rem;
+  margin-top: 0.1rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .sym-check-marker {
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background: #F1F4F3;
   color: #5B6B65;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
+  flex-shrink: 0;
 }
 
 .sym-chip-btn.selected .sym-check-marker {
@@ -360,45 +416,50 @@
 .sym-empty-filter {
   grid-column: 1 / -1;
   text-align: center;
-  padding: 2.5rem 1rem;
+  padding: 2rem 1rem;
   color: #5B6B65;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
 /* Severity & Duration Segment Controls */
 .sym-controls-card {
-  margin-top: 1.5rem;
-  padding-top: 1.25rem;
+  margin-top: 1.25rem;
+  padding-top: 1.15rem;
   border-top: 1px solid #E7ECEA;
+  width: 100%;
 }
 
 .sym-control-label {
-  font-size: 0.82rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: #16241F;
-  margin-bottom: 0.45rem;
+  margin-bottom: 0.4rem;
   display: block;
 }
 
 .sym-severity-toggles {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
-  gap: 0.5rem;
-  margin-bottom: 1rem;
+  gap: 0.45rem;
+  margin-bottom: 0.85rem;
+  width: 100%;
 }
 
 .sym-toggle-btn {
   background: #F8FAFA;
   border: 1px solid #DDE4E2;
-  border-radius: 12px;
-  padding: 0.6rem 0.5rem;
+  border-radius: 10px;
+  padding: 0.55rem 0.35rem;
   font-family: 'Inter', sans-serif;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
   color: #5B6B65;
   cursor: pointer;
   text-align: center;
   transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .sym-toggle-btn.selected.mild {
@@ -425,15 +486,15 @@
 .sym-duration-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
+  gap: 0.65rem;
+  margin-bottom: 1.15rem;
 }
 
 .sym-input-num {
-  width: 90px;
+  width: 75px;
   font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  padding: 0.55rem 0.75rem;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.65rem;
   border-radius: 10px;
   border: 1px solid #DDE4E2;
   background: #FFFFFF;
@@ -443,12 +504,12 @@
 .sym-btn-primary {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
   background: #146356;
   color: #FFFFFF;
   border: none;
   border-radius: 999px;
-  padding: 0.9rem 1.5rem;
+  padding: 0.85rem 1.35rem;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(20, 99, 86, 0.25);
   transition: all 0.15s ease;
@@ -457,13 +518,11 @@
 
 .sym-btn-primary:hover {
   background: #0E493F;
-  transform: translateY(-1px);
 }
 
 .sym-btn-primary:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-  transform: none;
 }
 
 /* ========================================================
@@ -471,37 +530,39 @@
    ======================================================== */
 .sym-result-panel {
   background: #FFFFFF;
+  width: 100%;
+  min-width: 0;
 }
 
 .sym-empty-guide {
   text-align: center;
-  padding: 2.5rem 1rem;
+  padding: 2rem 0.75rem;
 }
 
 .sym-empty-icon {
-  font-size: 3.5rem;
-  margin-bottom: 0.75rem;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
   display: block;
 }
 
 .sym-empty-guide h4 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.25rem;
-  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+  margin: 0 0 0.4rem;
   color: #16241F;
 }
 
 .sym-empty-guide p {
   color: #5B6B65;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  margin: 0 0 1.5rem;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  margin: 0 0 1.25rem;
 }
 
 .sym-guide-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.65rem;
+  gap: 0.55rem;
   text-align: left;
 }
 
@@ -509,27 +570,27 @@
   background: #F8FAFA;
   border: 1px solid #E7ECEA;
   border-radius: 12px;
-  padding: 0.75rem 0.85rem;
+  padding: 0.65rem 0.75rem;
 }
 
 .sym-guide-item span {
-  font-size: 1.1rem;
-  margin-bottom: 0.25rem;
+  font-size: 1rem;
+  margin-bottom: 0.2rem;
   display: block;
 }
 
 .sym-guide-item h6 {
-  margin: 0 0 0.2rem;
-  font-size: 0.82rem;
+  margin: 0 0 0.15rem;
+  font-size: 0.78rem;
   font-weight: 700;
   color: #16241F;
 }
 
 .sym-guide-item p {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   color: #5B6B65;
-  line-height: 1.3;
+  line-height: 1.25;
 }
 
 /* Prediction Output */
@@ -538,15 +599,15 @@
   justify-content: space-between;
   align-items: flex-start;
   border-bottom: 1px solid #E7ECEA;
-  padding-bottom: 1.25rem;
-  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 .sym-badge-label {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: #5B6B65;
@@ -554,17 +615,18 @@
 
 .sym-disease-title {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #0F4E44;
-  margin: 0.25rem 0 0;
+  margin: 0.2rem 0 0;
+  word-break: break-word;
 }
 
 .sym-urgency-badge {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 800;
-  padding: 0.4rem 0.95rem;
+  padding: 0.35rem 0.8rem;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -590,29 +652,32 @@
 .sym-specialist-banner {
   background: linear-gradient(135deg, #F0FDF4 0%, #E8F5E9 100%);
   border: 1px solid #A7F3D0;
-  border-radius: 18px;
-  padding: 1.25rem;
+  border-radius: 16px;
+  padding: 1rem 1.15rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1.35rem;
+  margin-bottom: 1.15rem;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.65rem;
+  width: 100%;
 }
 
 .sym-spec-info {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 0.75rem;
+  min-width: 0;
 }
 
 .sym-spec-icon {
-  font-size: 2.2rem;
+  font-size: 2rem;
+  flex-shrink: 0;
 }
 
 .sym-spec-label {
   font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #166534;
@@ -621,69 +686,69 @@
 
 .sym-spec-name {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.15rem;
-  margin: 0.15rem 0 0;
+  font-size: 1.05rem;
+  margin: 0.1rem 0 0;
   color: #14532D;
   font-weight: 700;
+  word-break: break-word;
 }
 
 .sym-btn-book {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 700;
   background: #15803D;
   color: #FFFFFF;
   border: none;
   border-radius: 999px;
-  padding: 0.6rem 1.2rem;
+  padding: 0.5rem 1.1rem;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
-  box-shadow: 0 3px 10px rgba(21, 128, 61, 0.2);
 }
 
 .sym-btn-book:hover {
   background: #166534;
-  transform: translateY(-1px);
 }
 
 /* Sensitive Health Banner */
 .sym-sensitive-banner {
   background: #FAF5FF;
   border: 1px solid #E9D5FF;
-  border-radius: 16px;
-  padding: 1.15rem 1.35rem;
-  margin-bottom: 1.35rem;
+  border-radius: 14px;
+  padding: 1rem 1.15rem;
+  margin-bottom: 1.15rem;
   color: #6B21A8;
+  width: 100%;
 }
 
 .sym-sensitive-banner strong {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   display: block;
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.3rem;
 }
 
 .sym-sensitive-banner p {
-  font-size: 0.85rem;
-  line-height: 1.45;
-  margin: 0 0 0.85rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  margin: 0 0 0.75rem;
 }
 
 .sym-sensitive-actions {
   display: flex;
-  gap: 0.6rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
 }
 
 .sym-btn-sm {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   background: #7E22CE;
   color: #FFFFFF;
   border: none;
   border-radius: 999px;
-  padding: 0.45rem 0.95rem;
+  padding: 0.4rem 0.85rem;
   cursor: pointer;
 }
 
@@ -693,62 +758,67 @@
 
 /* Section Blocks */
 .sym-section-block {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.15rem;
+  width: 100%;
 }
 
 .sym-section-block h4 {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.95rem;
-  margin: 0 0 0.45rem;
+  font-size: 0.9rem;
+  margin: 0 0 0.35rem;
   color: #16241F;
 }
 
 .sym-section-block p {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #4B5563;
-  line-height: 1.5;
+  line-height: 1.45;
   margin: 0;
 }
 
 .sym-meds-list {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 0.5rem;
+  gap: 0.45rem;
+  margin-top: 0.4rem;
+  width: 100%;
 }
 
 .sym-med-item {
   background: #F8FAFA;
   border: 1px solid #E7ECEA;
-  border-radius: 14px;
-  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
+  width: 100%;
 }
 
 .sym-med-item strong {
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #146356;
 }
 
 .sym-med-item p {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #5B6B65;
-  margin: 0.15rem 0 0;
+  margin: 0.1rem 0 0;
 }
 
 .sym-quick-btn {
   font-family: 'Space Grotesk', sans-serif;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 700;
   background: #146356;
   color: #FFFFFF;
   border: none;
   border-radius: 999px;
-  padding: 0.4rem 0.85rem;
+  padding: 0.35rem 0.75rem;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sym-quick-btn:hover {
@@ -757,95 +827,104 @@
 
 .sym-diff-tags {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
-  margin-top: 0.45rem;
+  margin-top: 0.35rem;
+  width: 100%;
 }
 
 .sym-diff-chip {
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   background: #F3F4F6;
   color: #374151;
-  padding: 0.4rem 0.75rem;
-  border-radius: 10px;
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
   border: 1px solid #E5E7EB;
 }
 
 .sym-footer-disclaimer {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #6B7280;
-  line-height: 1.45;
-  margin-top: 1.25rem;
-  padding-top: 1rem;
+  line-height: 1.4;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
   border-top: 1px solid #E7ECEA;
 }
 
 /* History Cards */
 .sym-history-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0.85rem;
+  width: 100%;
 }
 
 .sym-history-card {
   background: #F8FAFA;
   border: 1px solid #E7ECEA;
-  border-radius: 16px;
-  padding: 1rem 1.25rem;
+  border-radius: 14px;
+  padding: 0.85rem 1rem;
 }
 
 .sym-history-header {
   display: flex;
   justify-content: space-between;
-  font-size: 0.95rem;
+  font-size: 0.88rem;
+  gap: 0.4rem;
 }
 
 .sym-hist-date {
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   color: #5B6B65;
+  white-space: nowrap;
 }
 
 .sym-hist-symptoms {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: #4B5563;
-  margin: 0.5rem 0;
-  line-height: 1.45;
+  margin: 0.4rem 0;
+  line-height: 1.4;
 }
 
 .sym-hist-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 0.5rem;
+  margin-top: 0.4rem;
 }
 
 .sym-urgency-chip {
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  padding: 0.2rem 0.55rem;
-  border-radius: 6px;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
   text-transform: uppercase;
 }
 
 .sym-hist-spec {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #146356;
   font-weight: 600;
 }
 
 .sym-disclaimer {
-  margin-top: 2.5rem;
-  padding: 1.25rem 1.5rem;
+  margin-top: 2rem;
+  padding: 1rem 1.25rem;
   background: #FEF3C7;
   border: 1px solid #FDE68A;
-  border-radius: 18px;
-  font-size: 0.85rem;
+  border-radius: 14px;
+  font-size: 0.8rem;
   color: #92400E;
-  line-height: 1.55;
+  line-height: 1.5;
+  width: 100%;
 }
 
-@media (max-width: 900px) {
+/* Responsive breakpoint: Switch to 1 column smoothly on screens < 960px */
+@media (max-width: 960px) {
   .sym-layout {
     grid-template-columns: 1fr;
+  }
+  .sym-checklist-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
