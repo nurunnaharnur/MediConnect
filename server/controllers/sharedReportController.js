@@ -65,7 +65,7 @@ export const getMySharedReports = async (req, res) => {
   try {
     const shared = await SharedReport.find({ patientId: req.user._id })
       .sort({ sharedAt: -1 })
-      .populate('reportId', 'symptoms severity generatedAt pdfFileName')
+      .populate('reportId', 'diseaseFocus symptoms severity generatedAt pdfFileName designatedDoctorName')
       .populate('doctorId', 'name email specialization');
     res.json(shared);
   } catch (error) {
@@ -79,7 +79,7 @@ export const getReportsSharedWithMe = async (req, res) => {
   try {
     const shared = await SharedReport.find({ doctorId: req.user._id })
       .sort({ sharedAt: -1 })
-      .populate('reportId', 'symptoms severity generatedAt pdfFileName vitalsSnapshot')
+      .populate('reportId', 'diseaseFocus symptoms severity generatedAt pdfFileName vitalsSnapshot clinicalDataSnapshot summary')
       .populate('patientId', 'name email age gender medicalHistory');
     res.json(shared);
   } catch (error) {
@@ -97,7 +97,7 @@ export const getSharedReportById = async (req, res) => {
 
   try {
     const shared = await SharedReport.findById(id)
-      .populate('reportId', 'symptoms severity generatedAt pdfFileName vitalsSnapshot')
+      .populate('reportId', 'diseaseFocus symptoms severity generatedAt pdfFileName vitalsSnapshot clinicalDataSnapshot summary')
       .populate('patientId', 'name email age gender medicalHistory')
       .populate('doctorId', 'name email specialization');
 

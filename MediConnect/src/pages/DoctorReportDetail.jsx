@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { fetchSharedReportById } from '../api/sharedReportApi';
+import { downloadReport } from '../api/healthReportApi';
 import {
   fetchDiagnosesForSharedReport,
   createDiagnosis,
@@ -16,6 +17,8 @@ function formatDate(date) {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
   });
 }
 
@@ -25,6 +28,7 @@ export default function DoctorReportDetail() {
   const [diagnoses, setDiagnoses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [downloading, setDownloading] = useState(false);
 
   const [showForm, setShowForm] = useState(false);
   const [editingId, setEditingId] = useState(null);
@@ -55,6 +59,19 @@ export default function DoctorReportDetail() {
       isMounted = false;
     };
   }, [id]);
+
+  async function handleDownloadPDF() {
+    if (!shared?.reportId?._id) return;
+    setDownloading(true);
+    setError('');
+    try {
+      await downloadReport(shared.reportId._id, shared.reportId.pdfFileName);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setDownloading(false);
+    }
+  }
 
   function openCreateForm() {
     setEditingId(null);
@@ -127,7 +144,7 @@ export default function DoctorReportDetail() {
     return (
       <div className="docrep-page">
         <div className="docrep-shell">
-          <p className="docrep-muted">Loading…</p>
+          <p className="docrep-muted">Loading confidential patient report…</p>
         </div>
       </div>
     );
@@ -144,6 +161,8 @@ export default function DoctorReportDetail() {
     );
   }
 
+  const snapshot = shared.reportId?.clinicalDataSnapshot;
+
   return (
     <div className="docrep-page">
       <div className="docrep-shell">
@@ -153,36 +172,90 @@ export default function DoctorReportDetail() {
 
         <div className="docrep-detail-header">
           <div>
-            <p className="docrep-eyebrow">Patient</p>
+            <p className="docrep-eyebrow">Exclusively Designated Patient</p>
             <h1>{shared.patientId?.name}</h1>
             <p className="docrep-patient-meta">
               {shared.patientId?.age ? `${shared.patientId.age} yrs · ` : ''}
               {shared.patientId?.gender || ''}
+              {shared.reportId?.vitalsSnapshot?.bmi ? ` · BMI: ${shared.reportId.vitalsSnapshot.bmi} kg/m²` : ''}
             </p>
             {shared.patientId?.medicalHistory && (
-              <p className="docrep-patient-history">History: {shared.patientId.medicalHistory}</p>
+              <p className="docrep-patient-history">Known History: {shared.patientId.medicalHistory}</p>
             )}
           </div>
-          <span className={`docrep-status-tag ${shared.status.toLowerCase()}`}>{shared.status}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+            <span className={`docrep-status-tag ${(shared.status || 'shared').toLowerCase()}`}>{shared.status}</span>
+            <button
+              className="docrep-btn-primary"
+              onClick={handleDownloadPDF}
+              disabled={downloading}
+              style={{ fontSize: '0.82rem', padding: '0.45rem 0.95rem' }}
+            >
+              {downloading ? 'Downloading…' : '📥 Download Official PDF'}
+            </button>
+          </div>
         </div>
 
-        <div className="docrep-report-box">
-          <p className="docrep-section-title">Shared report — {formatDate(shared.reportId?.generatedAt)}</p>
-          <p className="docrep-report-severity">Severity: {shared.reportId?.severity}</p>
-          <p className="docrep-report-symptoms">{shared.reportId?.symptoms}</p>
+        {/* Clinical Report Focus Box */}
+        <div className="docrep-report-box" style={{ borderLeft: '4px solid #146356' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <h3 style={{ margin: 0, color: '#146356', fontFamily: 'Space Grotesk, sans-serif' }}>
+              🎯 Target Focus: {shared.reportId?.diseaseFocus || 'General Clinical Health'}
+            </h3>
+            <span style={{ fontSize: '0.8rem', color: '#5B6B65' }}>
+              Generated: {formatDate(shared.reportId?.generatedAt)}
+            </span>
+          </div>
+
+          <p className="docrep-report-severity">
+            Severity Rating: <strong>{shared.reportId?.severity}</strong>
+          </p>
+          <p className="docrep-report-symptoms" style={{ marginTop: '0.5rem', fontSize: '0.95rem' }}>
+            <strong>Patient Symptoms &amp; Chief Complaint:</strong> {shared.reportId?.symptoms}
+          </p>
+
+          {/* Clinical Data Snapshot Items if available */}
+          {snapshot && (
+            <div style={{ marginTop: '1rem', paddingTop: '0.85rem', borderTop: '1px dashed #DDE4E2' }}>
+              <strong style={{ fontSize: '0.85rem', color: '#16241F' }}>Attached Clinical Snapshot:</strong>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '0.5rem', fontSize: '0.82rem', color: '#374151' }}>
+                {snapshot.medications && snapshot.medications.length > 0 && (
+                  <div>
+                    <strong>💊 Prescriptions ({snapshot.medications.length}):</strong>{' '}
+                    {snapshot.medications.map((m) => m.name).join(', ')}
+                  </div>
+                )}
+                {snapshot.vitals && snapshot.vitals.length > 0 && (
+                  <div>
+                    <strong>🫀 Recent BP:</strong> {snapshot.vitals[0].systolic}/{snapshot.vitals[0].diastolic} mmHg ({snapshot.vitals[0].status})
+                  </div>
+                )}
+                {snapshot.screenings && snapshot.screenings.length > 0 && (
+                  <div>
+                    <strong>🧠 Screening:</strong> {snapshot.screenings[0].type} ({snapshot.screenings[0].indication || 'Normal'})
+                  </div>
+                )}
+                {snapshot.cycleInfo && (
+                  <div>
+                    <strong>🌸 Cycle:</strong> {snapshot.cycleInfo.phase} (Day {snapshot.cycleInfo.currentDay})
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="docrep-diagnoses-header">
-          <h2>Diagnosis &amp; prescriptions</h2>
+          <h2>Clinical Diagnosis &amp; Prescriptions</h2>
           <button className="docrep-btn-primary" onClick={openCreateForm}>
-            + Add diagnosis
+            + Add Diagnosis &amp; Prescribe
           </button>
         </div>
 
         {diagnoses.length === 0 ? (
           <div className="docrep-empty">
-            <p className="docrep-empty-title">No diagnosis added yet</p>
-            <p>Add diagnosis notes and, if needed, a prescription for this patient.</p>
+            <p className="docrep-empty-title">No Doctor Diagnosis Recorded Yet</p>
+            <p>Add your clinical notes, diagnostic conclusions, and prescribed medications for this patient's condition.</p>
           </div>
         ) : (
           <div className="docrep-list">
@@ -194,11 +267,11 @@ export default function DoctorReportDetail() {
                     Edit
                   </button>
                 </div>
-                <p className="docrep-section-title">Diagnosis notes</p>
+                <p className="docrep-section-title">Diagnosis Notes</p>
                 <p className="docrep-text">{d.diagnosisNotes}</p>
                 {d.observations && (
                   <>
-                    <p className="docrep-section-title">Observations</p>
+                    <p className="docrep-section-title">Clinical Observations</p>
                     <p className="docrep-text">{d.observations}</p>
                   </>
                 )}
@@ -210,7 +283,7 @@ export default function DoctorReportDetail() {
                 )}
                 {d.medicines?.length > 0 && (
                   <>
-                    <p className="docrep-section-title">Prescription</p>
+                    <p className="docrep-section-title">Prescribed Medications</p>
                     <div className="docrep-medicine-table">
                       {d.medicines.map((m, i) => (
                         <div key={i} className="docrep-medicine-row">
@@ -233,40 +306,44 @@ export default function DoctorReportDetail() {
       {showForm && (
         <div className="docrep-overlay" onClick={() => setShowForm(false)}>
           <div className="docrep-form-card" onClick={(e) => e.stopPropagation()}>
-            <h2>{editingId ? 'Edit diagnosis' : 'Add diagnosis'}</h2>
+            <h2>{editingId ? 'Edit Diagnosis' : 'Submit Official Diagnosis & Prescription'}</h2>
             <form onSubmit={handleSubmit}>
               <div className="docrep-field">
-                <label htmlFor="diagnosisNotes">Diagnosis notes</label>
+                <label htmlFor="diagnosisNotes">Diagnosis Notes &amp; Findings *</label>
                 <textarea
                   id="diagnosisNotes"
                   value={form.diagnosisNotes}
+                  placeholder="Clinical assessment, diagnosis, condition stage..."
                   onChange={(e) => setForm((f) => ({ ...f, diagnosisNotes: e.target.value }))}
+                  required
                 />
               </div>
 
               <div className="docrep-field">
-                <label htmlFor="observations">Observations (optional)</label>
+                <label htmlFor="observations">Clinical Observations (Optional)</label>
                 <textarea
                   id="observations"
                   value={form.observations}
+                  placeholder="Observed vitals, test remarks, symptom patterns..."
                   onChange={(e) => setForm((f) => ({ ...f, observations: e.target.value }))}
                 />
               </div>
 
               <div className="docrep-field">
-                <label htmlFor="recommendations">Recommendations (optional)</label>
+                <label htmlFor="recommendations">Diet, Exercise &amp; Care Recommendations (Optional)</label>
                 <textarea
                   id="recommendations"
                   value={form.recommendations}
+                  placeholder="Dietary changes, follow-up tests, exercise guidance..."
                   onChange={(e) => setForm((f) => ({ ...f, recommendations: e.target.value }))}
                 />
               </div>
 
               <div className="docrep-medicine-editor">
                 <div className="docrep-medicine-editor-header">
-                  <label>Prescription (optional)</label>
+                  <label>Prescribe Medications (Optional)</label>
                   <button type="button" className="docrep-btn-secondary" onClick={addMedicine}>
-                    + Add medicine
+                    + Add Medicine
                   </button>
                 </div>
                 {form.medicines.map((m, index) => (
@@ -279,25 +356,25 @@ export default function DoctorReportDetail() {
                     />
                     <input
                       type="text"
-                      placeholder="Dosage"
+                      placeholder="Dosage (e.g. 500mg)"
                       value={m.dosage}
                       onChange={(e) => updateMedicine(index, 'dosage', e.target.value)}
                     />
                     <input
                       type="text"
-                      placeholder="Frequency"
+                      placeholder="Frequency (e.g. Twice daily)"
                       value={m.frequency}
                       onChange={(e) => updateMedicine(index, 'frequency', e.target.value)}
                     />
                     <input
                       type="text"
-                      placeholder="Duration"
+                      placeholder="Duration (e.g. 7 days)"
                       value={m.duration}
                       onChange={(e) => updateMedicine(index, 'duration', e.target.value)}
                     />
                     <input
                       type="text"
-                      placeholder="Instructions (optional)"
+                      placeholder="Instructions (e.g. After meals)"
                       value={m.instructions}
                       onChange={(e) => updateMedicine(index, 'instructions', e.target.value)}
                     />
@@ -315,7 +392,7 @@ export default function DoctorReportDetail() {
                   Cancel
                 </button>
                 <button type="submit" className="docrep-btn-primary" disabled={saving}>
-                  {saving ? 'Saving…' : editingId ? 'Save changes' : 'Save diagnosis'}
+                  {saving ? 'Saving…' : editingId ? 'Update Diagnosis' : 'Save & Issue Diagnosis'}
                 </button>
               </div>
             </form>

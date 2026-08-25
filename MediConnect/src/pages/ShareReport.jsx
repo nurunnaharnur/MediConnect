@@ -37,10 +37,10 @@ export default function ShareReport() {
           fetchMySharedReports(),
         ]);
         if (isMounted) {
-          setReports(reportData);
-          setDoctors(doctorData);
-          setAppointments(appointmentData);
-          setShared(sharedData);
+          setReports(Array.isArray(reportData) ? reportData : []);
+          setDoctors(Array.isArray(doctorData) ? doctorData : []);
+          setAppointments(Array.isArray(appointmentData) ? appointmentData : []);
+          setShared(Array.isArray(sharedData) ? sharedData : []);
         }
       } catch (err) {
         if (isMounted) setError(err.message);
@@ -60,7 +60,7 @@ export default function ShareReport() {
     setSuccessMsg('');
 
     if (!form.reportId || !form.doctorId) {
-      setFormError('Choose a report and a doctor.');
+      setFormError('Please select both a health report and a doctor to share with.');
       return;
     }
 
@@ -71,10 +71,10 @@ export default function ShareReport() {
         doctorId: form.doctorId,
         appointmentId: form.appointmentId || undefined,
       });
-      setSuccessMsg('Report shared successfully.');
+      setSuccessMsg('Report shared exclusively with your designated doctor.');
       setForm({ reportId: '', doctorId: '', appointmentId: '' });
       const sharedData = await fetchMySharedReports();
-      setShared(sharedData);
+      setShared(Array.isArray(sharedData) ? sharedData : []);
     } catch (err) {
       setFormError(err.message);
     } finally {
@@ -85,59 +85,62 @@ export default function ShareReport() {
   return (
     <div className="share-page">
       <div className="share-shell">
-        <p className="share-eyebrow">Care coordination</p>
-        <h1>Share a Health Report</h1>
+        <p className="share-eyebrow">Confidential Care Coordination</p>
+        <h1>Share Health Report with Doctor</h1>
+        <p className="share-subtext" style={{ color: '#5B6B65', margin: '0 0 1.5rem' }}>
+          Grant specific, authorized access for your attending physician to review your disease clinical summaries, vitals, and diagnostic histories.
+        </p>
 
         {error && <div className="share-error-banner">{error}</div>}
 
         {loading ? (
-          <p className="share-muted">Loading…</p>
+          <p className="share-muted">Loading reports and physicians…</p>
         ) : (
           <>
             <form className="share-form" onSubmit={handleShare}>
               <div className="share-field">
-                <label htmlFor="reportId">Report</label>
+                <label htmlFor="reportId">Select Health Report</label>
                 <select
                   id="reportId"
                   value={form.reportId}
                   onChange={(e) => setForm((f) => ({ ...f, reportId: e.target.value }))}
                 >
-                  <option value="">Select a report</option>
+                  <option value="">Choose a generated report</option>
                   {reports.map((r) => (
                     <option key={r._id} value={r._id}>
-                      {formatDate(r.generatedAt)} — {r.severity} — {r.symptoms.slice(0, 40)}
+                      {r.diseaseFocus || 'General'} — {formatDate(r.generatedAt)} ({r.severity}) — {r.symptoms.slice(0, 35)}...
                     </option>
                   ))}
                 </select>
               </div>
 
               <div className="share-field">
-                <label htmlFor="doctorId">Doctor</label>
+                <label htmlFor="doctorId">Designate Doctor</label>
                 <select
                   id="doctorId"
                   value={form.doctorId}
                   onChange={(e) => setForm((f) => ({ ...f, doctorId: e.target.value }))}
                 >
-                  <option value="">Select a doctor</option>
+                  <option value="">Select attending doctor</option>
                   {doctors.map((d) => (
                     <option key={d._id} value={d._id}>
-                      Dr. {d.name}{d.specialization ? ` — ${d.specialization}` : ''}
+                      Dr. {d.name}{d.specialty || d.specialization ? ` — ${d.specialty || d.specialization}` : ''}
                     </option>
                   ))}
                 </select>
                 {doctors.length === 0 && (
-                  <p className="share-hint">No doctors have registered on MediConnect yet.</p>
+                  <p className="share-hint">No registered doctors found.</p>
                 )}
               </div>
 
               <div className="share-field">
-                <label htmlFor="appointmentId">Related appointment (optional)</label>
+                <label htmlFor="appointmentId">Related Appointment (Optional)</label>
                 <select
                   id="appointmentId"
                   value={form.appointmentId}
                   onChange={(e) => setForm((f) => ({ ...f, appointmentId: e.target.value }))}
                 >
-                  <option value="">None</option>
+                  <option value="">None (General Consultation)</option>
                   {appointments.map((a) => (
                     <option key={a._id} value={a._id}>
                       {formatDate(a.date)} — {a.doctorName}
@@ -150,15 +153,15 @@ export default function ShareReport() {
               {successMsg && <p className="share-form-success">{successMsg}</p>}
 
               <button type="submit" className="share-btn-primary" disabled={saving}>
-                {saving ? 'Sharing…' : 'Share report'}
+                {saving ? 'Sharing securely…' : '🔒 Share Exclusively With Doctor'}
               </button>
             </form>
 
-            <h2 className="share-history-title">Sharing history</h2>
+            <h2 className="share-history-title">Sharing History &amp; Access Log</h2>
             {shared.length === 0 ? (
               <div className="share-empty">
-                <p className="share-empty-title">No reports shared yet</p>
-                <p>Reports you share with a doctor will show up here.</p>
+                <p className="share-empty-title">No Reports Shared Yet</p>
+                <p>When you designate a health report for a doctor, the access log will appear here.</p>
               </div>
             ) : (
               <div className="share-list">
@@ -167,13 +170,16 @@ export default function ShareReport() {
                     <div className="share-card-main">
                       <div>
                         <div className="share-card-doctor">
-                          Dr. {s.doctorId?.name}{s.doctorId?.specialization ? ` — ${s.doctorId.specialization}` : ''}
+                          👨‍⚕️ Dr. {s.doctorId?.name}{s.doctorId?.specialization || s.doctorId?.specialty ? ` — ${s.doctorId.specialization || s.doctorId.specialty}` : ''}
                         </div>
                         <div className="share-card-report">
-                          {s.reportId?.severity} report from {formatDate(s.reportId?.generatedAt)}
+                          <strong style={{ color: '#146356' }}>
+                            {s.reportId?.diseaseFocus || 'General Clinical Health'}
+                          </strong>{' '}
+                          ({s.reportId?.severity || 'Mild'} severity) from {formatDate(s.reportId?.generatedAt)}
                         </div>
                       </div>
-                      <span className={`share-status-tag ${s.status.toLowerCase()}`}>{s.status}</span>
+                      <span className={`share-status-tag ${(s.status || 'shared').toLowerCase()}`}>{s.status}</span>
                     </div>
                     <div className="share-card-meta">Shared on {formatDate(s.sharedAt)}</div>
                   </div>
