@@ -4,6 +4,8 @@ import mongoose from 'mongoose';
 
 import authRoutes from './routes/authRoutes.js';
 import reminderRoutes from './routes/reminderRoutes.js';
+import hospitalRoutes from './routes/hospitalRoutes.js';
+import doctorRoutes from './routes/doctorRoutes.js';
 import cors from 'cors';
 
 
@@ -16,6 +18,8 @@ app.use(express.json());
 app.use(cors());
 app.use('/api/auth', authRoutes);
 app.use('/api/reminders', reminderRoutes);
+app.use('/api/hospitals', hospitalRoutes);
+app.use('/api/doctors', doctorRoutes);
 
 // Database connection
 mongoose.connect(process.env.MONGODB_URI)
