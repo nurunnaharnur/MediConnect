@@ -1,9 +1,10 @@
 import express from 'express';
 import {
   bookAppointment,
-  getPatientAppointments,
-  cancelAppointment,
-  getAvailableDoctors
+  getAppointments,
+  getAvailableDoctors,
+  rescheduleAppointment,
+  cancelAppointment
 } from '../controllers/appointmentController.js';
 import { protect } from '../middleware/auth.js';
 
@@ -13,9 +14,11 @@ router.use(protect);
 
 router.route('/')
   .post(bookAppointment)
-  .get(getPatientAppointments);
+  .get(getAppointments);
 
 router.get('/doctors', getAvailableDoctors);
+router.put('/:id/reschedule', rescheduleAppointment);
+router.put('/:id/cancel', cancelAppointment);
 router.patch('/:id/cancel', cancelAppointment);
 
 export default router;

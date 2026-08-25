@@ -21,6 +21,10 @@ async function appointmentRequest(path, options = {}) {
   return data;
 }
 
+// GET /api/appointments
+export const fetchAppointments = () => appointmentRequest('/appointments');
+export const fetchPatientAppointments = fetchAppointments;
+
 // POST /api/appointments
 export const bookAppointment = (payload) =>
   appointmentRequest('/appointments', {
@@ -28,14 +32,18 @@ export const bookAppointment = (payload) =>
     body: JSON.stringify(payload),
   });
 
-// GET /api/appointments
-export const fetchPatientAppointments = () => appointmentRequest('/appointments');
+// PUT /api/appointments/:id/reschedule
+export const rescheduleAppointment = (id, { date, time }) =>
+  appointmentRequest(`/appointments/${id}/reschedule`, {
+    method: 'PUT',
+    body: JSON.stringify({ date, time }),
+  });
 
-// GET /api/appointments/doctors
-export const fetchAvailableDoctors = () => appointmentRequest('/appointments/doctors');
-
-// PATCH /api/appointments/:id/cancel
+// PATCH / PUT /api/appointments/:id/cancel
 export const cancelAppointment = (id) =>
   appointmentRequest(`/appointments/${id}/cancel`, {
     method: 'PATCH',
   });
+
+// GET /api/appointments/doctors
+export const fetchAvailableDoctors = () => appointmentRequest('/appointments/doctors');

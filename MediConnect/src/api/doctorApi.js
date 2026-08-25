@@ -36,3 +36,6 @@ export const updateDoctorAppointment = (id, payload) =>
     method: 'PATCH',
     body: JSON.stringify(payload),
   });
+
+// GET /api/doctors
+export const fetchDoctors = () => doctorRequest('/doctors');

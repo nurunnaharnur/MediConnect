@@ -1,0 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+.pcos-page {
+  --ink: #16241F;
+  --paper: #F5F7F6;
+  --surface: #FFFFFF;
+  --rail: #D8E3E0;
+  --primary: #A8305C;
+  --primary-soft: #FBE7EE;
+  --muted: #5B6B65;
+  --danger: #C4441C;
+  --danger-soft: #FBEBE4;
+  --success: #146356;
+  --success-soft: #E4EFEC;
+  --warn: #A8791A;
+  --warn-soft: #FBF2DF;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 5rem;
+  box-sizing: border-box;
+}
+.pcos-page * { box-sizing: border-box; }
+.pcos-page .pcos-shell { max-width: 640px; margin: 0 auto; }
+.pcos-page .pcos-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 0.35rem;
+}
+.pcos-page h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700; margin: 0 0 0.5rem; }
+.pcos-page .pcos-subtitle { color: var(--muted); margin: 0 0 1.75rem; font-size: 0.9rem; }
+.pcos-page .pcos-muted { color: var(--muted); }
+
+.pcos-page .pcos-error-banner, .pcos-page .pcos-success-banner {
+  border-radius: 12px; padding: 0.8rem 1rem; font-size: 0.88rem; margin-bottom: 1.5rem;
+}
+.pcos-page .pcos-error-banner { background: var(--danger-soft); color: var(--danger); }
+.pcos-page .pcos-success-banner { background: var(--success-soft); color: var(--success); }
+
+.pcos-page .pcos-result { border-radius: 14px; padding: 1.25rem; margin-bottom: 1.75rem; }
+.pcos-page .pcos-result-none { background: var(--success-soft); }
+.pcos-page .pcos-result-single { background: var(--warn-soft); }
+.pcos-page .pcos-result-multiple { background: var(--danger-soft); }
+.pcos-page .pcos-result-title {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.1rem; margin: 0 0 0.5rem;
+}
+.pcos-page .pcos-result-none .pcos-result-title { color: var(--success); }
+.pcos-page .pcos-result-single .pcos-result-title { color: var(--warn); }
+.pcos-page .pcos-result-multiple .pcos-result-title { color: var(--danger); }
+.pcos-page .pcos-flag-list { margin: 0; padding-left: 1.2rem; font-size: 0.88rem; color: var(--ink); }
+.pcos-page .pcos-flag-list li { margin-bottom: 0.3rem; }
+
+.pcos-page .pcos-form { background: var(--surface); border-radius: 14px; padding: 1.5rem; border: 1px solid #E7ECEA; }
+.pcos-page .pcos-form h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.15rem; margin: 0 0 0.4rem; }
+.pcos-page .pcos-form-hint { font-size: 0.82rem; color: var(--muted); margin: 0 0 1rem; }
+.pcos-page .pcos-checkbox {
+  display: flex; align-items: center; gap: 0.6rem; font-size: 0.92rem; margin-bottom: 0.7rem; cursor: pointer;
+}
+.pcos-page .pcos-checkbox input { width: 1.1rem; height: 1.1rem; accent-color: var(--primary); }
+
+.pcos-page .pcos-field { margin: 1rem 0; display: flex; flex-direction: column; gap: 0.35rem; }
+.pcos-page .pcos-field label { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.pcos-page .pcos-field textarea {
+  font-family: 'Inter', sans-serif; font-size: 0.95rem; padding: 0.6rem 0.7rem; border-radius: 10px;
+  border: 1px solid #DDE4E2; background: var(--paper); color: var(--ink); min-height: 4rem; resize: vertical;
+}
+
+.pcos-page .pcos-btn-primary {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.9rem;
+  background: var(--primary); color: #fff; border: none; border-radius: 999px;
+  padding: 0.65rem 1.3rem; cursor: pointer;
+}
+.pcos-page .pcos-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.pcos-page .pcos-disclaimer {
+  margin-top: 1.75rem; font-size: 0.82rem; color: var(--muted); background: var(--surface);
+  border: 1px dashed var(--rail); border-radius: 12px; padding: 1rem 1.1rem; line-height: 1.5;
+}

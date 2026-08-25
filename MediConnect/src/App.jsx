@@ -7,6 +7,17 @@ import MentalWellbeing from './pages/MentalWellbeing';
 import DoctorLogin from './pages/DoctorLogin';
 import DoctorRegister from './pages/DoctorRegister';
 import DoctorDashboard from './pages/DoctorDashboard';
+import Appointments from './pages/Appointments';
+import GenerateReport from './pages/GenerateReport';
+import ReportHistory from './pages/ReportHistory';
+import SymptomHistory from './pages/SymptomHistory';
+import CycleTracker from './pages/CycleTracker';
+import CyclePrediction from './pages/CyclePrediction';
+import PcosCheck from './pages/PcosCheck';
+import ShareReport from './pages/ShareReport';
+import MyDiagnoses from './pages/MyDiagnoses';
+import DoctorSharedReports from './pages/DoctorSharedReports';
+import DoctorReportDetail from './pages/DoctorReportDetail';
 import { getToken, getUser } from './api/authApi';
 
 // Guard for Patient-accessible routes
@@ -86,6 +97,78 @@ function App() {
             </RequirePatientAuth>
           }
         />
+        <Route
+          path="/appointments"
+          element={
+            <RequirePatientAuth>
+              <Appointments />
+            </RequirePatientAuth>
+          }
+        />
+        <Route
+          path="/reports/generate"
+          element={
+            <RequirePatientAuth>
+              <GenerateReport />
+            </RequirePatientAuth>
+          }
+        />
+        <Route
+          path="/reports/history"
+          element={
+            <RequirePatientAuth>
+              <ReportHistory />
+            </RequirePatientAuth>
+          }
+        />
+        <Route
+          path="/symptoms"
+          element={
+            <RequirePatientAuth>
+              <SymptomHistory />
+            </RequirePatientAuth>
+          }
+        />
+        <Route
+          path="/cycles"
+          element={
+            <RequirePatientAuth>
+              <CycleTracker />
+            </RequirePatientAuth>
+          }
+        />
+        <Route
+          path="/cycles/prediction"
+          element={
+            <RequirePatientAuth>
+              <CyclePrediction />
+            </RequirePatientAuth>
+          }
+        />
+        <Route
+          path="/pcos"
+          element={
+            <RequirePatientAuth>
+              <PcosCheck />
+            </RequirePatientAuth>
+          }
+        />
+        <Route
+          path="/reports/share"
+          element={
+            <RequirePatientAuth>
+              <ShareReport />
+            </RequirePatientAuth>
+          }
+        />
+        <Route
+          path="/diagnoses"
+          element={
+            <RequirePatientAuth>
+              <MyDiagnoses />
+            </RequirePatientAuth>
+          }
+        />
 
         {/* Doctor Protected Routes */}
         <Route
@@ -93,6 +176,22 @@ function App() {
           element={
             <RequireDoctorAuth>
               <DoctorDashboard />
+            </RequireDoctorAuth>
+          }
+        />
+        <Route
+          path="/doctor/reports"
+          element={
+            <RequireDoctorAuth>
+              <DoctorSharedReports />
+            </RequireDoctorAuth>
+          }
+        />
+        <Route
+          path="/doctor/reports/:id"
+          element={
+            <RequireDoctorAuth>
+              <DoctorReportDetail />
             </RequireDoctorAuth>
           }
         />

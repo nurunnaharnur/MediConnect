@@ -112,7 +112,7 @@ export default function Login() {
             Don't have an account? <Link to="/register">Create one</Link>
           </p>
 
-          {/* Doctor Portal Redirect as explicitly required */}
+          {/* Doctor Portal Redirect */}
           <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E7ECEA', textAlign: 'center', fontSize: '0.88rem', color: '#5B6B65' }}>
             Are you a doctor? <Link to="/doctor-login" style={{ color: '#146356', fontWeight: '700', textDecoration: 'none' }}>Login here</Link>
           </div>

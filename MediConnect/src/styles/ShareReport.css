@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+.share-page {
+  --ink: #16241F;
+  --paper: #F5F7F6;
+  --surface: #FFFFFF;
+  --rail: #D8E3E0;
+  --primary: #146356;
+  --primary-soft: #E4EFEC;
+  --muted: #5B6B65;
+  --danger: #C4441C;
+  --danger-soft: #FBEBE4;
+  --success: #146356;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 5rem;
+  box-sizing: border-box;
+}
+.share-page * { box-sizing: border-box; }
+.share-page .share-shell { max-width: 700px; margin: 0 auto; }
+.share-page .share-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 0.35rem;
+}
+.share-page h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700; margin: 0 0 1.75rem; }
+.share-page .share-muted { color: var(--muted); }
+.share-page .share-error-banner {
+  background: var(--danger-soft); color: var(--danger); border-radius: 12px; padding: 0.8rem 1rem;
+  font-size: 0.88rem; margin-bottom: 1.5rem;
+}
+
+.share-page .share-form { background: var(--surface); border-radius: 14px; padding: 1.5rem; border: 1px solid #E7ECEA; margin-bottom: 2.25rem; }
+.share-page .share-field { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.share-page .share-field label { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.share-page .share-field select {
+  font-family: 'Inter', sans-serif; font-size: 0.95rem; padding: 0.6rem 0.7rem; border-radius: 10px;
+  border: 1px solid #DDE4E2; background: var(--paper); color: var(--ink);
+}
+.share-page .share-hint { font-size: 0.78rem; color: var(--muted); margin: 0.2rem 0 0; }
+.share-page .share-form-error { color: var(--danger); font-size: 0.85rem; margin: 0 0 0.75rem; }
+.share-page .share-form-success { color: var(--success); font-size: 0.85rem; margin: 0 0 0.75rem; }
+.share-page .share-btn-primary {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.9rem;
+  background: var(--primary); color: #fff; border: none; border-radius: 999px;
+  padding: 0.65rem 1.3rem; cursor: pointer;
+}
+.share-page .share-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.share-page .share-history-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; margin: 0 0 1rem; }
+.share-page .share-empty { text-align: center; padding: 2.5rem 1rem; color: var(--muted); }
+.share-page .share-empty-title {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.05rem; color: var(--ink); margin-bottom: 0.4rem;
+}
+.share-page .share-list { display: flex; flex-direction: column; gap: 0.8rem; }
+.share-page .share-card { background: var(--surface); border: 1px solid #E7ECEA; border-radius: 14px; padding: 1rem 1.2rem; }
+.share-page .share-card-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; }
+.share-page .share-card-doctor { font-family: 'Space Grotesk', sans-serif; font-weight: 600; }
+.share-page .share-card-report { font-size: 0.85rem; color: var(--muted); margin-top: 0.15rem; }
+.share-page .share-card-meta { font-size: 0.78rem; color: var(--muted); margin-top: 0.6rem; }
+.share-page .share-status-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 0.3rem 0.6rem; border-radius: 6px; white-space: nowrap;
+}
+.share-page .share-status-tag.shared { background: #FBF2DF; color: #A8791A; }
+.share-page .share-status-tag.viewed { background: var(--primary-soft); color: var(--primary); }

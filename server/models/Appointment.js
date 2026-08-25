@@ -9,21 +9,27 @@ const AppointmentSchema = new mongoose.Schema({
   },
   doctorId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true,
-    index: true
+    ref: 'User'
   },
   doctorName: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
   doctorSpecialty: {
     type: String,
-    default: 'General Practice'
+    default: 'General Practice',
+    trim: true
+  },
+  department: {
+    type: String,
+    default: '',
+    trim: true
   },
   patientName: {
     type: String,
-    required: true
+    default: '',
+    trim: true
   },
   date: {
     type: Date,
@@ -35,7 +41,8 @@ const AppointmentSchema = new mongoose.Schema({
   },
   reason: {
     type: String,
-    required: true
+    default: '',
+    trim: true
   },
   type: {
     type: String,
@@ -44,7 +51,7 @@ const AppointmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['scheduled', 'completed', 'cancelled'],
+    enum: ['scheduled', 'completed', 'cancelled', 'Booked', 'Rescheduled', 'Cancelled', 'Completed'],
     default: 'scheduled'
   },
   clinicalNotes: {

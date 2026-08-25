@@ -15,6 +15,7 @@ const formatUserResponse = (user) => ({
   email: user.email,
   role: user.role || 'patient',
   specialization: user.specialization || '',
+  qualification: user.qualification || '',
   licenseNumber: user.licenseNumber || '',
   age: user.age || 0,
   gender: user.gender || '',
@@ -25,28 +26,56 @@ const formatUserResponse = (user) => ({
   token: generateToken(user._id)
 });
 
-// @desc    Register Patient
+// @desc    Register a Patient or a Doctor
 // @route   POST /api/auth/register
 export const register = async (req, res) => {
-  const { name, email, password, age, gender, height, weight, medicalHistory, emergencyContact } = req.body;
-  
+  const {
+    name,
+    email,
+    password,
+    age,
+    gender,
+    height,
+    weight,
+    medicalHistory,
+    role,
+    specialization,
+    qualification,
+    licenseNumber,
+    emergencyContact
+  } = req.body;
+
+  const finalRole = (role === 'doctor') ? 'doctor' : 'patient';
+
+  if (finalRole === 'doctor' && (!specialization || !specialization.trim())) {
+    return res.status(400).json({ message: 'Specialization is required to register as a doctor.' });
+  }
+
   try {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'Email is already registered.' });
 
-    const user = await User.create({
+    const userData = {
       name,
       email,
       password,
-      role: 'patient',
-      age: age || 0,
-      gender: gender || '',
-      height: height || 0,
-      weight: weight || 0,
-      medicalHistory: medicalHistory || '',
-      emergencyContact: emergencyContact || { name: '', email: '', phone: '', relationship: '' }
-    });
+      role: finalRole
+    };
 
+    if (finalRole === 'doctor') {
+      userData.specialization = specialization;
+      userData.qualification = qualification || '';
+      userData.licenseNumber = licenseNumber || '';
+    } else {
+      userData.age = age || 0;
+      userData.gender = gender || 'Other';
+      userData.height = height || 0;
+      userData.weight = weight || 0;
+      userData.medicalHistory = medicalHistory || '';
+      userData.emergencyContact = emergencyContact || { name: '', email: '', phone: '', relationship: '' };
+    }
+
+    const user = await User.create(userData);
     res.status(201).json(formatUserResponse(user));
   } catch (error) {
     console.error('Registration error:', error);
@@ -57,7 +86,7 @@ export const register = async (req, res) => {
 // @desc    Register Doctor
 // @route   POST /api/auth/doctor-register
 export const doctorRegister = async (req, res) => {
-  const { name, email, password, specialization, licenseNumber } = req.body;
+  const { name, email, password, specialization, qualification, licenseNumber } = req.body;
 
   try {
     if (!name || !email || !password || !specialization) {
@@ -73,6 +102,7 @@ export const doctorRegister = async (req, res) => {
       password,
       role: 'doctor',
       specialization,
+      qualification: qualification || '',
       licenseNumber: licenseNumber || ''
     });
 
@@ -83,11 +113,11 @@ export const doctorRegister = async (req, res) => {
   }
 };
 
-// @desc    Authenticate Patient
+// @desc    Authenticate Patient or Doctor
 // @route   POST /api/auth/login
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  
+
   try {
     const user = await User.findOne({ email });
     if (user && (await user.comparePassword(password))) {

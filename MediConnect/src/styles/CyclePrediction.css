@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+.predict-page {
+  --ink: #16241F;
+  --paper: #F5F7F6;
+  --surface: #FFFFFF;
+  --rail: #D8E3E0;
+  --primary: #A8305C;
+  --primary-soft: #FBE7EE;
+  --muted: #5B6B65;
+  --danger: #C4441C;
+  --danger-soft: #FBEBE4;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 5rem;
+  box-sizing: border-box;
+}
+.predict-page * { box-sizing: border-box; }
+.predict-page .predict-shell { max-width: 700px; margin: 0 auto; }
+.predict-page .predict-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 0.35rem;
+}
+.predict-page h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700; margin: 0 0 1.75rem; }
+.predict-page .predict-muted { color: var(--muted); }
+
+.predict-page .predict-error-banner {
+  background: var(--danger-soft); color: var(--danger); border-radius: 12px;
+  padding: 0.8rem 1rem; font-size: 0.88rem; margin-bottom: 1.5rem;
+}
+
+.predict-page .predict-empty {
+  background: var(--surface); border-radius: 14px; padding: 2rem; text-align: center; color: var(--muted);
+}
+.predict-page .predict-empty-title {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.1rem; color: var(--ink); margin-bottom: 0.4rem;
+}
+
+.predict-page .predict-grid {
+  display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-bottom: 2rem;
+}
+.predict-page .predict-stat {
+  background: var(--surface); border-radius: 14px; padding: 1.1rem 1.25rem; border: 1px solid #E7ECEA;
+  display: flex; flex-direction: column; gap: 0.35rem;
+}
+.predict-page .predict-stat.highlight { border-color: var(--primary); background: var(--primary-soft); }
+.predict-page .predict-stat-label {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--muted);
+}
+.predict-page .predict-stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; }
+
+.predict-page .predict-disclaimer {
+  font-size: 0.82rem; color: var(--muted); background: var(--surface); border: 1px dashed var(--rail);
+  border-radius: 12px; padding: 1rem 1.1rem; line-height: 1.5;
+}
+
+@media (max-width: 560px) {
+  .predict-page .predict-grid { grid-template-columns: 1fr; }
+}

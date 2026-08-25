@@ -1,22 +1,26 @@
 {
-  "name": "mediconnect-backend",
+  "name": "mediconnect",
   "version": "1.0.0",
-  "description": "MediConnect Backend Server",
-  "main": "/server/server.js",
+  "description": "MediConnect Healthcare Platform",
+  "license": "ISC",
+  "author": "Nur",
   "type": "module",
+  "main": "server/server.js",
   "scripts": {
     "start": "node server/server.js",
-    "dev": "nodemon --env-file=.env server/server.js"
+    "dev": "nodemon --env-file=.env server/server.js",
+    "seed:doctors": "node server/seed/seedDoctors.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.6",
-    "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.3.1",
     "node-cron": "^4.6.0",
-    "nodemailer": "^9.0.3"
+    "nodemailer": "^9.0.3",
+    "pdfkit": "^0.19.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.14"

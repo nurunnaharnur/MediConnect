@@ -5,14 +5,18 @@ export const getToken = () => localStorage.getItem('mc_token');
 export const getUser = () => {
   try {
     const raw = localStorage.getItem('mc_user');
-    return raw ? JSON.parse(raw) : null;
+    if (!raw) return null;
+    const user = JSON.parse(raw);
+    return { ...user, role: user.role || 'patient' };
   } catch {
     return null;
   }
 };
 
 export const saveSession = (data) => {
-  localStorage.setItem('mc_token', data.token);
+  if (data.token) {
+    localStorage.setItem('mc_token', data.token);
+  }
   localStorage.setItem(
     'mc_user',
     JSON.stringify({
@@ -21,12 +25,13 @@ export const saveSession = (data) => {
       email: data.email,
       role: data.role || 'patient',
       specialization: data.specialization || '',
+      qualification: data.qualification || '',
       licenseNumber: data.licenseNumber || '',
-      age: data.age,
-      gender: data.gender,
-      height: data.height,
-      weight: data.weight,
-      medicalHistory: data.medicalHistory,
+      age: data.age || 0,
+      gender: data.gender || '',
+      height: data.height || 0,
+      weight: data.weight || 0,
+      medicalHistory: data.medicalHistory || '',
       emergencyContact: data.emergencyContact || { name: '', email: '', phone: '', relationship: '' }
     })
   );

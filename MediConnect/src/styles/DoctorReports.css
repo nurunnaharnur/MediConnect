@@ -1,0 +1,135 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+.docrep-page {
+  --ink: #16241F;
+  --paper: #F5F7F6;
+  --surface: #FFFFFF;
+  --rail: #D8E3E0;
+  --primary: #146356;
+  --primary-soft: #E4EFEC;
+  --muted: #5B6B65;
+  --danger: #C4441C;
+  --danger-soft: #FBEBE4;
+  --warn: #A8791A;
+  --warn-soft: #FBF2DF;
+
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 5rem;
+  box-sizing: border-box;
+}
+.docrep-page * { box-sizing: border-box; }
+.docrep-page .docrep-shell { max-width: 780px; margin: 0 auto; }
+.docrep-page .docrep-eyebrow {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--muted); margin: 0 0 0.35rem;
+}
+.docrep-page h1 { font-family: 'Space Grotesk', sans-serif; font-size: 1.9rem; font-weight: 700; margin: 0 0 0.5rem; }
+.docrep-page .docrep-muted { color: var(--muted); }
+.docrep-page .docrep-back-link {
+  display: inline-block; margin-bottom: 1.25rem; font-size: 0.85rem; color: var(--muted); text-decoration: none;
+}
+.docrep-page .docrep-back-link:hover { color: var(--primary); }
+
+.docrep-page .docrep-error-banner {
+  background: var(--danger-soft); color: var(--danger); border-radius: 12px; padding: 0.8rem 1rem;
+  font-size: 0.88rem; margin-bottom: 1.5rem;
+}
+.docrep-page .docrep-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.docrep-page .docrep-empty-title {
+  font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.1rem; color: var(--ink); margin-bottom: 0.4rem;
+}
+
+.docrep-page .docrep-list { display: flex; flex-direction: column; gap: 1rem; }
+.docrep-page .docrep-card, .docrep-page .docrep-diagnosis-card {
+  background: var(--surface); border: 1px solid #E7ECEA; border-radius: 14px; padding: 1.2rem;
+}
+.docrep-page .docrep-card-main, .docrep-page .docrep-detail-header {
+  display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;
+}
+.docrep-page .docrep-card-patient { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1.05rem; }
+.docrep-page .docrep-card-report { font-size: 0.85rem; color: var(--muted); margin-top: 0.15rem; }
+.docrep-page .docrep-card-symptoms { font-size: 0.88rem; margin: 0.7rem 0; }
+.docrep-page .docrep-card-actions { margin-top: 0.6rem; }
+
+.docrep-page .docrep-status-tag {
+  font-family: 'IBM Plex Mono', monospace; font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 0.3rem 0.6rem; border-radius: 6px; white-space: nowrap;
+}
+.docrep-page .docrep-status-tag.shared { background: var(--warn-soft); color: var(--warn); }
+.docrep-page .docrep-status-tag.viewed { background: var(--primary-soft); color: var(--primary); }
+
+.docrep-page .docrep-detail-header { margin-bottom: 1.5rem; }
+.docrep-page .docrep-patient-meta { color: var(--muted); font-size: 0.88rem; margin: 0.2rem 0; }
+.docrep-page .docrep-patient-history { font-size: 0.85rem; color: var(--muted); }
+
+.docrep-page .docrep-report-box {
+  background: var(--surface); border: 1px solid #E7ECEA; border-radius: 14px; padding: 1.1rem 1.25rem; margin-bottom: 1.75rem;
+}
+.docrep-page .docrep-section-title {
+  font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600;
+  color: var(--muted); margin: 0.9rem 0 0.3rem;
+}
+.docrep-page .docrep-section-title:first-child { margin-top: 0; }
+.docrep-page .docrep-report-severity { font-size: 0.9rem; font-weight: 600; margin: 0.2rem 0; }
+.docrep-page .docrep-report-symptoms { font-size: 0.9rem; margin: 0; }
+.docrep-page .docrep-text { margin: 0; font-size: 0.92rem; line-height: 1.5; }
+
+.docrep-page .docrep-diagnoses-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.docrep-page .docrep-diagnoses-header h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; margin: 0; }
+.docrep-page .docrep-diagnosis-header { display: flex; justify-content: space-between; align-items: center; }
+.docrep-page .docrep-diagnosis-date { font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem; color: var(--muted); }
+
+.docrep-page .docrep-medicine-table { display: flex; flex-direction: column; gap: 0.4rem; }
+.docrep-page .docrep-medicine-row {
+  display: grid; grid-template-columns: 1.2fr 0.9fr 0.9fr 0.9fr 1.4fr; gap: 0.6rem;
+  background: var(--primary-soft); border-radius: 8px; padding: 0.5rem 0.7rem; font-size: 0.85rem; align-items: center;
+}
+.docrep-page .docrep-medicine-name { font-weight: 600; }
+.docrep-page .docrep-medicine-instructions { color: var(--muted); font-size: 0.8rem; }
+
+.docrep-page .docrep-btn-secondary, .docrep-page .docrep-btn-primary {
+  font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem; border-radius: 999px;
+  padding: 0.5rem 1rem; cursor: pointer; border: 1px solid transparent; text-decoration: none; display: inline-block;
+}
+.docrep-page .docrep-btn-secondary { background: transparent; border-color: #DDE4E2; color: var(--muted); }
+.docrep-page .docrep-btn-primary { background: var(--primary); color: #fff; }
+.docrep-page button:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.docrep-page .docrep-overlay {
+  position: fixed; inset: 0; background: rgba(22, 36, 31, 0.35);
+  display: flex; align-items: flex-start; justify-content: center; padding: 3rem 1rem; z-index: 20; overflow-y: auto;
+}
+.docrep-page .docrep-form-card {
+  background: var(--surface); border-radius: 18px; padding: 1.75rem; width: 100%;
+  max-width: 620px; box-shadow: 0 20px 50px rgba(22, 36, 31, 0.18);
+}
+.docrep-page .docrep-form-card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; margin: 0 0 1.25rem; }
+.docrep-page .docrep-field { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.docrep-page .docrep-field label { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.docrep-page .docrep-field textarea {
+  font-family: 'Inter', sans-serif; font-size: 0.95rem; padding: 0.6rem 0.7rem; border-radius: 10px;
+  border: 1px solid #DDE4E2; background: var(--paper); color: var(--ink); min-height: 4rem; resize: vertical;
+}
+.docrep-page .docrep-medicine-editor { margin-bottom: 1rem; border-top: 1px dashed var(--rail); padding-top: 0.9rem; }
+.docrep-page .docrep-medicine-editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem; }
+.docrep-page .docrep-medicine-editor-header label { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.docrep-page .docrep-medicine-editor-row {
+  display: grid; grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr 1.2fr auto; gap: 0.4rem; margin-bottom: 0.5rem; align-items: center;
+}
+.docrep-page .docrep-medicine-editor-row input {
+  font-size: 0.85rem; padding: 0.45rem 0.5rem; border-radius: 8px; border: 1px solid #DDE4E2; background: var(--paper);
+}
+.docrep-page .docrep-remove-row {
+  background: var(--danger-soft); color: var(--danger); border: none; border-radius: 8px;
+  width: 1.9rem; height: 1.9rem; cursor: pointer;
+}
+.docrep-page .docrep-form-error { color: var(--danger); font-size: 0.85rem; margin: 0 0 0.75rem; }
+.docrep-page .docrep-form-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.2rem; }
+
+@media (max-width: 640px) {
+  .docrep-page .docrep-medicine-editor-row { grid-template-columns: 1fr 1fr; }
+  .docrep-page .docrep-medicine-row { grid-template-columns: 1fr 1fr; row-gap: 0.2rem; }
+}

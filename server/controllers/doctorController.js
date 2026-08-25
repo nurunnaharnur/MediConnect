@@ -38,7 +38,7 @@ export const getDoctorPatients = async (req, res) => {
         // Upcoming Appointments
         const nextAppointment = await Appointment.findOne({
           patientId: patient._id,
-          status: 'scheduled',
+          status: { $in: ['scheduled', 'Booked', 'Rescheduled'] },
           date: { $gte: new Date() }
         }).sort({ date: 1 });
 
@@ -179,5 +179,18 @@ export const updateDoctorAppointment = async (req, res) => {
   } catch (error) {
     console.error('Error updating appointment:', error);
     res.status(500).json({ message: error.message || 'Failed to update appointment.' });
+  }
+};
+
+// @desc    List all doctors patients can share reports with / book with
+// @route   GET /api/doctor (or /api/doctors)
+export const listDoctors = async (req, res) => {
+  try {
+    const doctors = await User.find({ role: 'doctor' }).select(
+      'name email specialization qualification licenseNumber'
+    );
+    res.json(doctors);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };

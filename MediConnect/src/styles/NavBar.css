@@ -1,0 +1,63 @@
+.mc-navbar {
+  background: #146356;
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+.mc-navbar-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0.9rem 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.mc-navbar-brand {
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  letter-spacing: -0.01em;
+  margin-right: auto;
+}
+
+.mc-navbar-links {
+  display: flex;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.mc-navbar-link {
+  color: #cfe6e0;
+  text-decoration: none;
+  font-size: 0.88rem;
+  font-weight: 500;
+  padding: 0.4rem 0.7rem;
+  border-radius: 8px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.mc-navbar-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.mc-navbar-link.active {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+}
+
+.mc-navbar-logout {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.mc-navbar-logout:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
