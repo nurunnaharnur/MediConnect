@@ -18,6 +18,7 @@ import sharedReportRoutes from './routes/sharedReportRoutes.js';
 import diagnosisRoutes from './routes/diagnosisRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import symptomRoutes from './routes/symptomRoutes.js';
+import symptomCheckRoutes from './routes/symptomCheckRoutes.js';
 import { initReminderScheduler } from './services/notificationService.js';
 
 const app = express();
@@ -41,6 +42,7 @@ app.use('/api/shared-reports', sharedReportRoutes);
 app.use('/api/diagnoses', diagnosisRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/symptom-checker', symptomRoutes);
+app.use('/api/symptom-check', symptomCheckRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {

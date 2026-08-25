@@ -1,104 +1,128 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { checkSymptoms, getSymptomCheckHistory, clearSymptomCheckHistory } from '../api/healthApi';
+import {
+  fetchSymptomOptions,
+  runSymptomCheck,
+  getSymptomCheckHistory,
+  clearSymptomCheckHistory,
+} from '../api/symptomApi';
 import '../styles/SymptomChecker.css';
 
-const SYMPTOM_OPTIONS = [
-  { id: 'fever', label: 'Fever / High Temperature', icon: '🌡️' },
-  { id: 'headache', label: 'Headache / Migraine', icon: '🤕' },
-  { id: 'cough', label: 'Persistent Cough', icon: '🗣️' },
-  { id: 'sore throat', label: 'Sore / Scratchy Throat', icon: '🧣' },
-  { id: 'shortness of breath', label: 'Shortness of Breath', icon: '🫁' },
-  { id: 'fatigue', label: 'Severe Fatigue & Weakness', icon: '🥱' },
-  { id: 'chest pain', label: 'Chest Pain or Tightness', icon: '🫀' },
-  { id: 'nausea', label: 'Nausea or Vomiting', icon: '🤢' },
-  { id: 'dizziness', label: 'Dizziness or Lightheadedness', icon: '💫' },
-  { id: 'body aches', label: 'Muscle & Body Aches', icon: '💪' },
-  { id: 'loss of taste/smell', label: 'Loss of Taste or Smell', icon: '👃' },
-  { id: 'runny nose', label: 'Runny or Stuffy Nose', icon: '🤧' },
-  { id: 'abdominal pain', label: 'Abdominal / Stomach Pain', icon: '🩺' },
+const DEFAULT_CATEGORIES = [
+  'All',
+  'General',
+  'Cardio / Respiratory',
+  'Neurological',
+  'Digestive',
+  'Metabolic',
+  'Mental Wellbeing',
+  'Reproductive Health',
+  'Skin',
+  'Musculoskeletal',
 ];
 
 export default function SymptomChecker() {
   const navigate = useNavigate();
+  const [symptomOptions, setSymptomOptions] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [selectedSymptoms, setSelectedSymptoms] = useState([]);
-  const [severity, setSeverity] = useState('Moderate');
+  const [severityLevel, setSeverityLevel] = useState('Moderate');
   const [durationDays, setDurationDays] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [predictionResult, setPredictionResult] = useState(null);
+  const [result, setResult] = useState(null);
   const [history, setHistory] = useState([]);
   const [error, setError] = useState('');
   const [toastMsg, setToastMsg] = useState('');
 
   useEffect(() => {
     let isMounted = true;
-    async function loadHistory() {
+    async function load() {
       try {
-        const data = await getSymptomCheckHistory();
-        if (isMounted) setHistory(data.history || []);
+        const [opts, hist] = await Promise.all([
+          fetchSymptomOptions().catch(() => []),
+          getSymptomCheckHistory().catch(() => []),
+        ]);
+        if (isMounted) {
+          setSymptomOptions(Array.isArray(opts) ? opts : []);
+          setHistory(Array.isArray(hist) ? hist : []);
+        }
       } catch (err) {
-        console.error('Error loading symptom history:', err);
+        console.error('Failed loading initial symptom options:', err);
       }
     }
-    loadHistory();
+    load();
     return () => {
       isMounted = false;
     };
   }, []);
 
-  function toggleSymptom(label) {
+  function toggleSymptom(key) {
     setSelectedSymptoms((prev) =>
-      prev.includes(label) ? prev.filter((s) => s !== label) : [...prev, label]
+      prev.includes(key) ? prev.filter((k) => k !== key) : [...prev, key]
     );
+  }
+
+  function handleClearSelection() {
+    setSelectedSymptoms([]);
+    setResult(null);
   }
 
   async function handleAnalyze(e) {
     e.preventDefault();
     if (selectedSymptoms.length === 0) {
-      setError('Please select at least one symptom to analyze.');
+      setError('Please select at least one symptom to evaluate.');
       return;
     }
 
     setError('');
     setLoading(true);
     try {
-      const data = await checkSymptoms({
+      const data = await runSymptomCheck({
         symptoms: selectedSymptoms,
-        severity,
+        severity: severityLevel,
         durationDays: Number(durationDays),
       });
-      setPredictionResult(data.result);
-      setToastMsg('🔮 Symptom check analysis completed!');
-      const hist = await getSymptomCheckHistory();
-      setHistory(hist.history || []);
+      setResult(data);
+      setToastMsg('🔮 Symptom check & clinical analysis completed!');
+      const updatedHistory = await getSymptomCheckHistory().catch(() => []);
+      setHistory(Array.isArray(updatedHistory) ? updatedHistory : []);
     } catch (err) {
-      setError(err.message || 'Symptom analysis failed.');
+      setError(err.message || 'Analysis request failed.');
     } finally {
       setLoading(false);
     }
   }
 
   async function handleClearHistory() {
-    if (!window.confirm('Clear all symptom check history?')) return;
+    if (!window.confirm('Are you sure you want to clear your symptom check history?')) return;
     try {
       await clearSymptomCheckHistory();
       setHistory([]);
-      setPredictionResult(null);
-      setSelectedSymptoms([]);
-      setToastMsg('🗑️ Symptom history cleared.');
+      setToastMsg('🗑️ Symptom check history cleared.');
     } catch (err) {
       setError(err.message);
     }
   }
 
+  // Filtered options based on category and search query
+  const filteredOptions = symptomOptions.filter((opt) => {
+    const matchCat = selectedCategory === 'All' || opt.category === selectedCategory;
+    const matchQuery =
+      searchQuery.trim() === '' ||
+      opt.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      opt.category.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchCat && matchQuery;
+  });
+
   return (
     <div className="sym-page">
       <div className="sym-shell">
         <div className="sym-header">
-          <p className="sym-eyebrow">Clinical Intelligence Engine</p>
-          <h1>AI Rule-Based Symptom Checker</h1>
+          <p className="sym-eyebrow">AI Rule-Based Clinical Engine</p>
+          <h1>Advanced Symptom & Disease Checker</h1>
           <p className="sym-subtext">
-            Select your current symptoms to evaluate combination patterns, differential diagnoses, and urgency classifications.
+            Evaluate expanded clinical combinations including Metabolic (Diabetes), Mental Wellbeing (Depression, Anxiety, OCD), Reproductive Health (PCOS), and receive specialist recommendations and urgency ratings.
           </p>
         </div>
 
@@ -111,51 +135,97 @@ export default function SymptomChecker() {
         )}
 
         <div className="sym-layout">
-          {/* Left Column: Symptom Selector Form */}
+          {/* LEFT COLUMN: SYMPTOM SELECTOR */}
           <div className="sym-card">
-            <h3>1. Select Observed Symptoms</h3>
-            <p className="sym-hint">Choose all symptoms currently affecting you:</p>
-
-            <div className="sym-chips-grid">
-              {SYMPTOM_OPTIONS.map((item) => {
-                const isSelected = selectedSymptoms.includes(item.label) || selectedSymptoms.includes(item.id);
-                return (
-                  <button
-                    key={item.id}
-                    type="button"
-                    className={`sym-chip-btn ${isSelected ? 'selected' : ''}`}
-                    onClick={() => toggleSymptom(item.label)}
-                  >
-                    <span>{item.icon}</span>
-                    <span>{item.label}</span>
-                  </button>
-                );
-              })}
+            <div className="sym-card-top-bar">
+              <div>
+                <h3>1. Select Observed Symptoms</h3>
+                <p className="sym-hint">
+                  {selectedSymptoms.length} symptom(s) currently selected
+                </p>
+              </div>
+              {selectedSymptoms.length > 0 && (
+                <button type="button" className="sym-btn-text-danger" onClick={handleClearSelection}>
+                  Reset Selection
+                </button>
+              )}
             </div>
 
-            <form onSubmit={handleAnalyze} style={{ marginTop: '1.5rem' }}>
+            {/* Search Input */}
+            <div className="sym-search-wrap">
+              <input
+                type="text"
+                className="sym-search-input"
+                placeholder="Search symptoms (e.g. fatigue, sadness, chest pain, periods)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
+            {/* Category Filter Pills */}
+            <div className="sym-cat-pills">
+              {DEFAULT_CATEGORIES.map((cat) => (
+                <button
+                  key={cat}
+                  type="button"
+                  className={`sym-cat-pill ${selectedCategory === cat ? 'active' : ''}`}
+                  onClick={() => setSelectedCategory(cat)}
+                >
+                  {cat}
+                </button>
+              ))}
+            </div>
+
+            {/* Checklist Grid */}
+            <div className="sym-checklist-grid">
+              {filteredOptions.length === 0 ? (
+                <div className="sym-empty-filter">No symptoms match your search.</div>
+              ) : (
+                filteredOptions.map((item) => {
+                  const isChecked = selectedSymptoms.includes(item.key);
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      className={`sym-chip-btn ${isChecked ? 'selected' : ''}`}
+                      onClick={() => toggleSymptom(item.key)}
+                    >
+                      <span className="sym-chip-icon">{item.icon || '🩺'}</span>
+                      <div className="sym-chip-body">
+                        <span className="sym-chip-title">{item.label}</span>
+                        <span className="sym-chip-cat">{item.category}</span>
+                      </div>
+                      <span className="sym-check-marker">{isChecked ? '✓' : '+'}</span>
+                    </button>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Severity and Submit Controls */}
+            <form onSubmit={handleAnalyze} style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E7ECEA' }}>
               <div className="sym-form-row">
                 <div className="sym-form-field">
-                  <label htmlFor="severity">Severity Level</label>
+                  <label htmlFor="severityLevel">Perceived Severity</label>
                   <select
-                    id="severity"
+                    id="severityLevel"
                     className="sym-select"
-                    value={severity}
-                    onChange={(e) => setSeverity(e.target.value)}
+                    value={severityLevel}
+                    onChange={(e) => setSeverityLevel(e.target.value)}
                   >
                     <option value="Mild">Mild (Noticeable but manageable)</option>
-                    <option value="Moderate">Moderate (Interfering with daily tasks)</option>
-                    <option value="Severe">Severe (Intense / Incapacitating)</option>
+                    <option value="Moderate">Moderate (Interfering with daily routine)</option>
+                    <option value="Severe">Severe (Intense / High impact)</option>
                   </select>
                 </div>
 
                 <div className="sym-form-field">
-                  <label htmlFor="durationDays">Duration (Days)</label>
+                  <label htmlFor="duration">Duration (Days)</label>
                   <input
-                    id="durationDays"
+                    id="duration"
                     type="number"
                     min="1"
-                    max="60"
+                    max="90"
                     className="sym-input"
                     value={durationDays}
                     onChange={(e) => setDurationDays(e.target.value)}
@@ -169,48 +239,92 @@ export default function SymptomChecker() {
                 disabled={loading || selectedSymptoms.length === 0}
                 style={{ width: '100%', marginTop: '1.25rem' }}
               >
-                {loading ? 'Analyzing Symptom Patterns…' : `🔍 Analyze ${selectedSymptoms.length} Selected Symptom(s)`}
+                {loading ? 'Evaluating Symptom Pattern…' : `🔍 Analyze ${selectedSymptoms.length} Selected Symptom(s)`}
               </button>
             </form>
           </div>
 
-          {/* Right Column: Prediction Results Card */}
+          {/* RIGHT COLUMN: PREDICTION & SPECIALIST RECOMMENDATION */}
           <div className="sym-card sym-result-panel">
-            <h3>2. Analysis & Disease Prediction</h3>
+            <h3>2. Analysis & Specialist Recommendation</h3>
 
-            {!predictionResult ? (
+            {!result ? (
               <div className="sym-empty-state">
-                <span style={{ fontSize: '3rem' }}>🩺</span>
+                <span style={{ fontSize: '3.2rem' }}>🩺</span>
                 <h4>No Analysis Generated Yet</h4>
-                <p>Select symptoms from the left panel and click "Analyze Symptoms" to run the algorithmic disease predictor.</p>
+                <p>
+                  Select your symptoms from the checklist on the left and click <strong>Analyze Selected Symptoms</strong> to run the rule-based prediction engine.
+                </p>
               </div>
             ) : (
               <div className="sym-prediction-content">
+                {/* Result Header */}
                 <div className="sym-prediction-top">
                   <div>
-                    <span className="sym-badge-label">Top Matched Condition</span>
-                    <h2 className="sym-disease-title">{predictionResult.prediction?.topPrediction?.disease}</h2>
-                    <span className="sym-confidence-pill">
-                      Confidence: {predictionResult.prediction?.topPrediction?.confidence}%
-                    </span>
+                    <span className="sym-badge-label">Predicted Condition / Indicator</span>
+                    <h2 className="sym-disease-title">{result.condition}</h2>
                   </div>
-                  <span
-                    className={`sym-urgency-badge urgency-${(predictionResult.prediction?.topPrediction?.urgency || 'moderate').toLowerCase()}`}
-                  >
-                    {predictionResult.prediction?.topPrediction?.urgency} Alert
+                  <span className={`sym-urgency-badge urgency-${(result.severity || 'low').toLowerCase()}`}>
+                    {result.severity} Urgency
                   </span>
                 </div>
 
-                <div className="sym-section-block">
-                  <h4>📋 Recommended Clinical Action</h4>
-                  <p>{predictionResult.prediction?.topPrediction?.recommendation}</p>
+                {/* Specialist Recommendation Card */}
+                <div className="sym-specialist-banner">
+                  <div className="sym-spec-info">
+                    <span className="sym-spec-icon">👨‍⚕️</span>
+                    <div>
+                      <span className="sym-spec-label">Recommended Specialist</span>
+                      <h4 className="sym-spec-name">{result.specialist}</h4>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="sym-btn-book"
+                    onClick={() => navigate('/appointments')}
+                  >
+                    📅 Book Appointment
+                  </button>
                 </div>
 
-                {predictionResult.prediction?.topPrediction?.medicines && (
+                {/* Sensitive / Mental Health Notice */}
+                {result.sensitive && (
+                  <div className="sym-sensitive-banner">
+                    <strong>💜 Mental & Reproductive Health Advisory</strong>
+                    <p>{result.disclaimer}</p>
+                    <div className="sym-sensitive-actions">
+                      <button
+                        type="button"
+                        className="sym-btn-sm"
+                        onClick={() => navigate('/mental-wellbeing')}
+                      >
+                        🧠 Open Mental Wellbeing Hub
+                      </button>
+                      <button
+                        type="button"
+                        className="sym-btn-sm"
+                        onClick={() => navigate('/pcos')}
+                      >
+                        🌸 Open PCOS Tracker
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {/* Recommendation / Action Guideline */}
+                {result.recommendation && (
                   <div className="sym-section-block">
-                    <h4>💊 Recommended Remedies & Treatments</h4>
+                    <h4>📋 Recommended Clinical Guidance</h4>
+                    <p>{result.recommendation}</p>
+                  </div>
+                )}
+
+                {/* Remedies & Prescriptions */}
+                {result.remedies && result.remedies.length > 0 && (
+                  <div className="sym-section-block">
+                    <h4>💊 Recommended Treatment & Remedies</h4>
                     <div className="sym-meds-list">
-                      {predictionResult.prediction.topPrediction.medicines.map((med, idx) => (
+                      {result.remedies.map((med, idx) => (
                         <div key={idx} className="sym-med-item">
                           <div>
                             <strong>💊 {med.name}</strong>
@@ -230,52 +344,65 @@ export default function SymptomChecker() {
                   </div>
                 )}
 
-                {predictionResult.prediction?.allPredictions && predictionResult.prediction.allPredictions.length > 1 && (
+                {/* Differential Diagnoses */}
+                {result.differentialDiagnoses && result.differentialDiagnoses.length > 0 && (
                   <div className="sym-section-block">
-                    <h4>🔍 Differential Diagnoses (Other Possible Matches)</h4>
+                    <h4>🔍 Differential Matches</h4>
                     <div className="sym-diff-tags">
-                      {predictionResult.prediction.allPredictions.slice(1).map((diff, idx) => (
+                      {result.differentialDiagnoses.map((diff, idx) => (
                         <span key={idx} className="sym-diff-chip">
-                          {diff.disease} ({diff.confidence}%)
+                          <strong>{diff.condition}</strong> ({diff.confidence}% overlap) • <small>{diff.specialist}</small>
                         </span>
                       ))}
                     </div>
                   </div>
+                )}
+
+                {/* General Disclaimer */}
+                {!result.sensitive && result.disclaimer && (
+                  <p className="sym-footer-disclaimer">
+                    ℹ️ {result.disclaimer}
+                  </p>
                 )}
               </div>
             )}
           </div>
         </div>
 
-        {/* History Log Section */}
+        {/* PAST SYMPTOM CHECK RECORDS */}
         {history.length > 0 && (
           <div className="sym-card" style={{ marginTop: '2rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-              <h3 style={{ margin: 0 }}>📜 Past Symptom Check Records</h3>
-              <button className="sym-btn-secondary" onClick={handleClearHistory}>
-                Clear History
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+              <h3 style={{ margin: 0 }}>📜 Past Symptom Check Records ({history.length})</h3>
+              <button type="button" className="sym-btn-secondary" onClick={handleClearHistory}>
+                Clear All Logs
               </button>
             </div>
 
             <div className="sym-history-grid">
               {history.map((item, idx) => (
-                <div key={idx} className="sym-history-card">
+                <div key={item._id || idx} className="sym-history-card">
                   <div className="sym-history-header">
-                    <strong>{item.prediction?.topPrediction?.disease || 'Check Record'}</strong>
+                    <strong>{item.condition}</strong>
                     <span className="sym-hist-date">
-                      {new Date(item.checkedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                      {item.createdAt || item.checkedAt
+                        ? new Date(item.createdAt || item.checkedAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })
+                        : 'Recent'}
                     </span>
                   </div>
                   <p className="sym-hist-symptoms">
-                    <strong>Symptoms:</strong> {item.symptoms?.join(', ')}
+                    <strong>Symptoms:</strong> {Array.isArray(item.symptoms) ? item.symptoms.join(', ') : ''}
                   </p>
-                  <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.4rem' }}>
-                    <span className={`sym-urgency-chip urgency-${(item.prediction?.topPrediction?.urgency || 'low').toLowerCase()}`}>
-                      {item.prediction?.topPrediction?.urgency}
+                  <div className="sym-hist-footer">
+                    <span className={`sym-urgency-chip urgency-${(item.severity || 'low').toLowerCase()}`}>
+                      {item.severity}
                     </span>
-                    <span className="sym-hist-conf">
-                      {item.prediction?.topPrediction?.confidence}% Match
-                    </span>
+                    <span className="sym-hist-spec">👨‍⚕️ {item.specialist}</span>
                   </div>
                 </div>
               ))}
@@ -284,7 +411,7 @@ export default function SymptomChecker() {
         )}
 
         <div className="sym-disclaimer">
-          ⚠️ <strong>Medical Advisory Notice:</strong> This AI-assisted rule-based symptom checker evaluates self-reported symptoms for educational awareness. It is not a clinical diagnostic device. If you experience severe chest pain, shortness of breath, or emergency symptoms, contact emergency medical services immediately.
+          ⚠️ <strong>Medical Advisory Disclaimer:</strong> MediConnect Symptom Checker uses deterministic, evidence-based clinical rules to assist patient self-awareness. It is not an automated medical diagnostic tool. In life-threatening situations, dial 911 or visit the nearest emergency care facility immediately.
         </div>
       </div>
     </div>
