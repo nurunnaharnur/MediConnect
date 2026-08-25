@@ -90,6 +90,7 @@ export const sendEmergencyAlert = (payload) => authRequest('/auth/emergency-aler
 
 // Personalized Health Tips
 export const fetchPersonalizedHealthTips = () => authRequest('/auth/health-tips', null, 'GET');
+export const getHealthTips = fetchPersonalizedHealthTips;
 
 // Download Full Patient Health Record & Profile PDF
 export const downloadComprehensiveHealthProfilePDF = async (userName = 'Patient') => {

@@ -626,51 +626,31 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Card 4: Menstruation Cycle Tracker */}
+          {/* Card 4: Menstruation Cycle Tracker (includes PCOS Tracker) */}
           <div
             className="dash-card dash-card-cycle"
-            onClick={() => setActiveModal('cycle')}
+            onClick={() => navigate('/cycles')}
             role="button"
             tabIndex={0}
           >
             <div className="dash-card-header">
               <div className="dash-icon-box cycle">🌸</div>
               <span className="dash-chip cycle">
-                {cycleData?.phase ? cycleData.phase : 'Cycle Tracking'}
+                {cycleData?.phase ? cycleData.phase : 'Menstruation & PCOS'}
               </span>
             </div>
-            <h3>Menstruation Cycle Tracker</h3>
+            <h3>Menstruation Tracker</h3>
             <p>
               {cycleData?.phase
-                ? `Currently in ${cycleData.phase} (Day ${cycleData.currentCycleDay} of ${cycleData.cycleLength}). Next period expected in ~${cycleData.daysUntilNext} day(s).`
-                : 'Track your period cycle phases, log daily symptoms, predict fertile windows, and access phase-specific wellness guidance.'}
+                ? `Currently in ${cycleData.phase} (Day ${cycleData.currentCycleDay} of ${cycleData.cycleLength}). Next period in ~${cycleData.daysUntilNext} days. Includes period predictions and PCOS pattern screening.`
+                : 'Track period cycle phases, predict fertile windows, log daily flow, and screen for PCOS hormonal patterns.'}
             </p>
             <div className="dash-card-footer">
-              <span className="dash-card-cta">Open Cycle Tracker →</span>
+              <span className="dash-card-cta">Open Menstruation Hub →</span>
             </div>
           </div>
 
-          {/* Card 5: PCOS Tracker & Pattern Screening */}
-          <div
-            className="dash-card"
-            onClick={() => navigate('/pcos')}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="dash-card-header">
-              <div className="dash-icon-box" style={{ background: '#FBE7EE', color: '#A8305C' }}>🔬</div>
-              <span className="dash-chip" style={{ background: '#FBE7EE', color: '#A8305C' }}>PCOS Screening</span>
-            </div>
-            <h3>PCOS Tracker & Pattern Check</h3>
-            <p>
-              Screen for PCOS risk patterns (acne, excess hair growth, hair thinning, weight changes) and track hormonal signs with algorithmic clinical indicators.
-            </p>
-            <div className="dash-card-footer">
-              <span className="dash-card-cta" style={{ color: '#A8305C' }}>Open PCOS Screening Hub →</span>
-            </div>
-          </div>
-
-          {/* Card 6: Clinical Reports & Doctor Diagnoses */}
+          {/* Card 5: Clinical Reports & Doctor Diagnoses */}
           <div
             className="dash-card"
             onClick={() => navigate('/reports/generate')}
@@ -681,16 +661,16 @@ export default function Dashboard() {
               <div className="dash-icon-box" style={{ background: '#E4EFEC', color: '#146356' }}>📄</div>
               <span className="dash-chip" style={{ background: '#E4EFEC', color: '#146356' }}>Clinical Reports</span>
             </div>
-            <h3>Health Reports & Diagnoses</h3>
+            <h3>Health Reports &amp; Diagnoses</h3>
             <p>
-              Generate structured symptom health reports, download clinical PDF records, share reports with physicians, and view doctor diagnoses.
+              Generate disease-focused clinical reports with automatic BMI &amp; weight vitals, download printable PDFs, and share exclusively with your doctor.
             </p>
             <div className="dash-card-footer">
               <span className="dash-card-cta" style={{ color: '#146356' }}>Generate / View Reports →</span>
             </div>
           </div>
 
-          {/* Card 7: AI Symptom Checker & Disease Predictor */}
+          {/* Card 6: AI Symptom Checker & Disease Predictor */}
           <div
             className="dash-card"
             onClick={() => navigate('/symptom-checker')}
@@ -701,7 +681,7 @@ export default function Dashboard() {
               <div className="dash-icon-box" style={{ background: '#EEF2FF', color: '#4F46E5' }}>🩺</div>
               <span className="dash-chip" style={{ background: '#EEF2FF', color: '#4F46E5' }}>AI Clinical Engine</span>
             </div>
-            <h3>AI Symptom & Disease Checker</h3>
+            <h3>AI Symptom &amp; Disease Checker</h3>
             <p>
               Rule-based evaluation across 13 symptom combinations, match confidence scoring, urgency badges, and quick dose scheduling.
             </p>
@@ -710,7 +690,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Card 8: Diet & Nutrition / Fitness Tracker */}
+          {/* Card 7: Diet & Nutrition / Fitness Tracker */}
           <div
             className="dash-card"
             onClick={() => navigate('/diet-fitness')}
@@ -719,18 +699,18 @@ export default function Dashboard() {
           >
             <div className="dash-card-header">
               <div className="dash-icon-box" style={{ background: '#FEF3C7', color: '#D97706' }}>🥗</div>
-              <span className="dash-chip" style={{ background: '#FEF3C7', color: '#D97706' }}>Nutrition & Burn</span>
+              <span className="dash-chip" style={{ background: '#FEF3C7', color: '#D97706' }}>Nutrition &amp; Burn</span>
             </div>
-            <h3>Diet & Fitness Tracker</h3>
+            <h3>Diet &amp; Fitness Tracker</h3>
             <p>
               Log meal calories and macros (P/C/F), record workout reps and active calorie burn, and view personalized target plans.
             </p>
             <div className="dash-card-footer">
-              <span className="dash-card-cta" style={{ color: '#D97706' }}>Open Diet & Fitness Hub →</span>
+              <span className="dash-card-cta" style={{ color: '#D97706' }}>Open Diet &amp; Fitness Hub →</span>
             </div>
           </div>
 
-          {/* Card 9: Blood Pressure Vitals & Trends */}
+          {/* Card 8: Blood Pressure Vitals & Trends */}
           <div
             className="dash-card"
             onClick={() => navigate('/blood-pressure')}
@@ -741,52 +721,12 @@ export default function Dashboard() {
               <div className="dash-icon-box" style={{ background: '#FEE2E2', color: '#DC2626' }}>🫀</div>
               <span className="dash-chip" style={{ background: '#FEE2E2', color: '#DC2626' }}>Cardiovascular Vitals</span>
             </div>
-            <h3>Blood Pressure & Vitals Trend</h3>
+            <h3>Blood Pressure &amp; Vitals Trend</h3>
             <p>
               Log systolic and diastolic readings, track dynamic SVG trend trajectory charts, and detect hypertensive risk categories.
             </p>
             <div className="dash-card-footer">
               <span className="dash-card-cta" style={{ color: '#DC2626' }}>Track Blood Pressure →</span>
-            </div>
-          </div>
-
-          {/* Card 7: AI Health Assistant */}
-          <div
-            className="dash-card"
-            onClick={() => setActiveModal('ai')}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="dash-card-header">
-              <div className="dash-icon-box ai">🤖</div>
-              <span className="dash-chip feature">AI Assistant</span>
-            </div>
-            <h3>AI Health Assistant</h3>
-            <p>
-              Have questions about dosage instructions, possible side effects, or dietary precautions? Ask your interactive assistant anytime.
-            </p>
-            <div className="dash-card-footer">
-              <span className="dash-card-cta">Ask AI Assistant →</span>
-            </div>
-          </div>
-
-          {/* Card 8: Health Profile & Records */}
-          <div
-            className="dash-card"
-            onClick={() => setActiveModal('profile')}
-            role="button"
-            tabIndex={0}
-          >
-            <div className="dash-card-header">
-              <div className="dash-icon-box records">📊</div>
-              <span className="dash-chip records">My Vitals</span>
-            </div>
-            <h3>Health Profile & Records</h3>
-            <p>
-              Review your registered patient profile, stored medical history, vitals, and emergency contact details.
-            </p>
-            <div className="dash-card-footer">
-              <span className="dash-card-cta">View Profile & Vitals →</span>
             </div>
           </div>
         </section>

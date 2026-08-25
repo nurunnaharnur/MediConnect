@@ -9,21 +9,57 @@ const DEFAULT_SLOTS = [
 ];
 
 /**
+ * Removes duplicate doctor entries from the Doctor collection
+ */
+export async function cleanupDuplicateDoctors() {
+  try {
+    const allDoctors = await Doctor.find().sort({ createdAt: 1 });
+    const seenEmails = new Set();
+    const seenUserIds = new Set();
+    const seenNames = new Set();
+
+    for (const doc of allDoctors) {
+      const email = doc.email ? doc.email.toLowerCase().trim() : null;
+      const userId = doc.userId ? doc.userId.toString() : null;
+      const name = doc.name ? doc.name.toLowerCase().trim() : null;
+
+      let isDuplicate = false;
+
+      if (userId && seenUserIds.has(userId)) isDuplicate = true;
+      if (email && seenEmails.has(email)) isDuplicate = true;
+      if (!userId && !email && name && seenNames.has(name)) isDuplicate = true;
+
+      if (isDuplicate) {
+        await Doctor.deleteOne({ _id: doc._id });
+      } else {
+        if (userId) seenUserIds.add(userId);
+        if (email) seenEmails.add(email);
+        if (name) seenNames.add(name);
+      }
+    }
+  } catch (error) {
+    console.error('Error cleaning up duplicate doctors:', error.message);
+  }
+}
+
+/**
  * Synchronizes a registered doctor user into the Doctor collection
  */
 export async function syncDoctorUser(userDoc) {
   if (!userDoc || userDoc.role !== 'doctor') return null;
 
   try {
-    // Check if Doctor record already exists by userId or email
+    const email = userDoc.email ? userDoc.email.toLowerCase().trim() : '';
+
+    // Check if Doctor record already exists by userId or email or name
     let doctor = await Doctor.findOne({
       $or: [
         { userId: userDoc._id },
-        ...(userDoc.email ? [{ email: userDoc.email.toLowerCase() }] : []),
+        ...(email ? [{ email }] : []),
+        { name: userDoc.name },
       ],
     });
 
-    // Find hospital to attach
     let hospitalId = userDoc.hospitalId;
     if (!hospitalId) {
       const defaultHospital = await Hospital.findOne().sort({ rating: -1 });
@@ -35,13 +71,13 @@ export async function syncDoctorUser(userDoc) {
     const specialty = userDoc.specialization || 'General Physician';
     const experienceYears = userDoc.experienceYears || 5;
     const bio = userDoc.bio ||
-      `${userDoc.qualification ? userDoc.qualification + ' — ' : ''}Specialist in ${specialty}. License ID: ${userDoc.licenseNumber || 'Verified'}. Dedicated to providing comprehensive healthcare and patient consultations.`;
+      `${userDoc.qualification ? userDoc.qualification + ' — ' : ''}Specialist in ${specialty}. License ID: ${userDoc.licenseNumber || 'Verified'}. Dedicated to comprehensive patient consultations.`;
 
     if (!doctor) {
       doctor = await Doctor.create({
         userId: userDoc._id,
         name: userDoc.name,
-        email: userDoc.email,
+        email,
         specialty,
         experienceYears,
         hospitalId,
@@ -50,11 +86,14 @@ export async function syncDoctorUser(userDoc) {
         availableSlots: DEFAULT_SLOTS,
       });
     } else {
-      // Update missing fields
       let modified = false;
       if (!doctor.userId) { doctor.userId = userDoc._id; modified = true; }
-      if (!doctor.email && userDoc.email) { doctor.email = userDoc.email; modified = true; }
+      if (!doctor.email && email) { doctor.email = email; modified = true; }
       if (!doctor.hospitalId && hospitalId) { doctor.hospitalId = hospitalId; modified = true; }
+      if (userDoc.specialization && doctor.specialty !== userDoc.specialization) {
+        doctor.specialty = userDoc.specialization;
+        modified = true;
+      }
       if (modified) await doctor.save();
     }
 
@@ -66,14 +105,16 @@ export async function syncDoctorUser(userDoc) {
 }
 
 /**
- * Synchronizes all registered doctor users in the system
+ * Synchronizes all registered doctor users in the system and cleans up duplicates
  */
 export async function syncAllDoctorUsers() {
   try {
+    await cleanupDuplicateDoctors();
     const doctorUsers = await User.find({ role: 'doctor' });
     for (const docUser of doctorUsers) {
       await syncDoctorUser(docUser);
     }
+    await cleanupDuplicateDoctors();
   } catch (error) {
     console.error('Error syncing all doctors:', error.message);
   }

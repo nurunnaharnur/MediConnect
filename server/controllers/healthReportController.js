@@ -128,13 +128,14 @@ export const generateReport = async (req, res) => {
     // If a doctor was designated, automatically share exclusively with this doctor
     let sharedRecord = null;
     if (designatedDoctor) {
+      const actualDoctorUserId = designatedDoctor.userId || designatedDoctor._id;
       sharedRecord = await SharedReport.create({
+        reportId: report._id,
         patientId: user._id,
-        doctorId: designatedDoctor._id,
-        healthReportId: report._id,
+        doctorId: actualDoctorUserId,
         notes: clinicalNotes || `Patient shared ${diseaseFocus} clinical report with you.`,
         sharedAt: generatedAt,
-        status: 'pending'
+        status: 'Shared'
       });
       report.sharedReportId = sharedRecord._id;
       await report.save();

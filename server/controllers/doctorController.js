@@ -185,24 +185,33 @@ export const listDoctors = async (req, res) => {
       .populate('userId', 'name email specialization qualification licenseNumber')
       .sort({ rating: -1 });
 
-    // Format uniform response with consistent fields
-    const formatted = doctors.map((doc) => ({
-      _id: doc.userId?._id || doc._id,
-      doctorId: doc._id,
-      userId: doc.userId?._id || null,
-      name: doc.name,
-      email: doc.email || doc.userId?.email || '',
-      specialty: doc.specialty,
-      specialization: doc.specialty || doc.userId?.specialization || 'General Physician',
-      qualification: doc.userId?.qualification || '',
-      licenseNumber: doc.userId?.licenseNumber || '',
-      experienceYears: doc.experienceYears,
-      rating: doc.rating,
-      bio: doc.bio,
-      hospitalId: doc.hospitalId?._id || null,
-      hospitalName: doc.hospitalId?.name || 'General Practice Clinic',
-      availableSlots: doc.availableSlots,
-    }));
+    // Format uniform response with deduplication
+    const seen = new Set();
+    const formatted = [];
+
+    for (const doc of doctors) {
+      const key = doc.email ? doc.email.toLowerCase().trim() : (doc.userId?._id?.toString() || doc._id.toString());
+      if (!seen.has(key)) {
+        seen.add(key);
+        formatted.push({
+          _id: doc.userId?._id || doc._id,
+          doctorId: doc._id,
+          userId: doc.userId?._id || null,
+          name: doc.name,
+          email: doc.email || doc.userId?.email || '',
+          specialty: doc.specialty,
+          specialization: doc.specialty || doc.userId?.specialization || 'General Physician',
+          qualification: doc.userId?.qualification || '',
+          licenseNumber: doc.userId?.licenseNumber || '',
+          experienceYears: doc.experienceYears,
+          rating: doc.rating,
+          bio: doc.bio,
+          hospitalId: doc.hospitalId?._id || null,
+          hospitalName: doc.hospitalId?.name || 'General Practice Clinic',
+          availableSlots: doc.availableSlots,
+        });
+      }
+    }
 
     res.json(formatted);
   } catch (error) {
@@ -217,7 +226,7 @@ export const getDoctors = async (req, res) => {
   const { hospitalId, specialty, minRating } = req.query;
 
   try {
-    // Sync any newly registered doctors
+    // Sync any newly registered doctors and cleanup duplicates
     await syncAllDoctorUsers();
 
     const query = {};
@@ -229,7 +238,6 @@ export const getDoctors = async (req, res) => {
     }
 
     if (specialty && specialty.trim()) {
-      // Use case-insensitive regex partial matching for specialty flexibility
       query.specialty = { $regex: new RegExp(specialty.trim(), 'i') };
     }
 
@@ -242,19 +250,28 @@ export const getDoctors = async (req, res) => {
       .populate('userId', 'name email specialization qualification licenseNumber')
       .sort({ rating: -1 });
 
-    const formatted = doctors.map((doc) => ({
-      _id: doc._id,
-      userId: doc.userId?._id || doc._id,
-      name: doc.name,
-      email: doc.email || doc.userId?.email || '',
-      specialty: doc.specialty,
-      specialization: doc.specialty,
-      experienceYears: doc.experienceYears,
-      rating: doc.rating,
-      bio: doc.bio,
-      hospitalId: doc.hospitalId,
-      availableSlots: doc.availableSlots,
-    }));
+    const seen = new Set();
+    const formatted = [];
+
+    for (const doc of doctors) {
+      const key = doc.email ? doc.email.toLowerCase().trim() : (doc.userId?._id?.toString() || doc._id.toString());
+      if (!seen.has(key)) {
+        seen.add(key);
+        formatted.push({
+          _id: doc._id,
+          userId: doc.userId?._id || doc._id,
+          name: doc.name,
+          email: doc.email || doc.userId?.email || '',
+          specialty: doc.specialty,
+          specialization: doc.specialty,
+          experienceYears: doc.experienceYears,
+          rating: doc.rating,
+          bio: doc.bio,
+          hospitalId: doc.hospitalId,
+          availableSlots: doc.availableSlots,
+        });
+      }
+    }
 
     res.json(formatted);
   } catch (error) {

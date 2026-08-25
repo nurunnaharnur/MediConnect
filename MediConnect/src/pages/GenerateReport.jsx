@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { generateReport, downloadReport } from '../api/healthReportApi';
 import { fetchDoctors } from '../api/doctorApi';
+import { getUser } from '../api/authApi';
 import '../styles/HealthReports.css';
 
 const DISEASE_OPTIONS = [
@@ -18,6 +19,7 @@ const DISEASE_OPTIONS = [
 
 export default function GenerateReport() {
   const navigate = useNavigate();
+  const user = getUser();
   const [diseaseFocus, setDiseaseFocus] = useState('🩸 Diabetes Mellitus & Blood Sugar');
   const [customDiseaseName, setCustomDiseaseName] = useState('');
   const [symptoms, setSymptoms] = useState('Frequent urination, excessive thirst, increased fatigue after meals.');
@@ -29,6 +31,17 @@ export default function GenerateReport() {
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
   const [downloading, setDownloading] = useState(false);
+
+  // Calculate BMI
+  let bmi = null;
+  let bmiCategory = 'Normal';
+  if (user?.height && user?.weight && user.height > 0) {
+    const hm = user.height / 100;
+    bmi = Number((user.weight / (hm * hm)).toFixed(1));
+    if (bmi < 18.5) bmiCategory = 'Underweight';
+    else if (bmi >= 25 && bmi < 30) bmiCategory = 'Overweight';
+    else if (bmi >= 30) bmiCategory = 'Obese';
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -52,6 +65,8 @@ export default function GenerateReport() {
       setSymptoms(opt.defaultSymptoms);
     }
   }
+
+  const selectedDoctorObj = doctors.find((d) => d._id === targetDoctorId || d.userId === targetDoctorId);
 
   const finalDiseaseName = diseaseFocus.includes('Custom')
     ? (customDiseaseName.trim() || 'Custom Health Condition')
@@ -103,8 +118,31 @@ export default function GenerateReport() {
         <p className="hr-eyebrow">Targeted Clinical Summary</p>
         <h1>Generate Disease Health Report</h1>
         <p className="hr-subtext">
-          Select a particular health condition to aggregate all related patient data (vitals, medications, logs, screenings) into a structured PDF report and optionally share it exclusively with your designated doctor.
+          Select a particular health condition to aggregate all related patient data (BMI, weight vitals, medications, logs, screenings) into a structured PDF report and optionally share it exclusively with your designated doctor.
         </p>
+
+        {/* Patient Vitals Card */}
+        <div style={{ background: '#FFFFFF', padding: '1.25rem', borderRadius: '16px', border: '1px solid #E7ECEA', marginBottom: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '1.5rem', alignItems: 'center' }}>
+          <div>
+            <span style={{ fontSize: '0.75rem', color: '#5B6B65', fontWeight: 600 }}>PATIENT VITALS SNAPSHOT</span>
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '0.35rem', flexWrap: 'wrap', alignItems: 'center' }}>
+              <span style={{ fontSize: '0.92rem', color: '#16241F' }}>
+                ⚖️ <strong>Weight:</strong> {user?.weight ? `${user.weight} kg` : 'Not recorded'}
+              </span>
+              <span style={{ fontSize: '0.92rem', color: '#16241F' }}>
+                📏 <strong>Height:</strong> {user?.height ? `${user.height} cm` : 'Not recorded'}
+              </span>
+              {bmi && (
+                <span style={{ fontSize: '0.85rem', padding: '0.2rem 0.6rem', borderRadius: '999px', background: bmiCategory === 'Normal' ? '#D1E7DD' : '#FEE2E2', color: bmiCategory === 'Normal' ? '#0F5132' : '#991B1B', fontWeight: 700 }}>
+                  BMI: {bmi} ({bmiCategory})
+                </span>
+              )}
+              <span style={{ fontSize: '0.92rem', color: '#5B6B65' }}>
+                👤 {user?.age ? `${user.age} yrs` : ''} {user?.gender || ''}
+              </span>
+            </div>
+          </div>
+        </div>
 
         {error && <div className="hr-error-banner">{error}</div>}
 
@@ -155,7 +193,7 @@ export default function GenerateReport() {
               <option value="">Do not share (Keep private in my personal record)</option>
               {doctors.map((doc) => (
                 <option key={doc._id} value={doc._id}>
-                  Dr. {doc.name} — {doc.specialty || doc.specialization || 'Attending Physician'}
+                  Dr. {doc.name} — {doc.specialty || doc.specialization || 'Attending Physician'} ({doc.hospitalName || 'General Clinic'})
                 </option>
               ))}
             </select>
@@ -163,7 +201,7 @@ export default function GenerateReport() {
 
           {/* 3. Symptoms & Severity */}
           <div className="hr-field">
-            <label htmlFor="symptoms">3. Specific Symptoms & Clinical Notes</label>
+            <label htmlFor="symptoms">3. Specific Symptoms &amp; Clinical Notes</label>
             <textarea
               id="symptoms"
               rows={4}
@@ -199,7 +237,11 @@ export default function GenerateReport() {
           </div>
 
           <button className="hr-btn-primary" type="submit" disabled={loading} style={{ marginTop: '1rem' }}>
-            {loading ? 'Aggregating Patient Data & Generating PDF…' : `📄 Generate ${finalDiseaseName.split(' ')[1] || 'Clinical'} Report`}
+            {loading
+              ? 'Aggregating Patient Data & Generating PDF…'
+              : selectedDoctorObj
+              ? `📄 Generate & Send Report to Dr. ${selectedDoctorObj.name}`
+              : `📄 Generate ${finalDiseaseName.split(' ')[1] || 'Clinical'} Report`}
           </button>
         </form>
 
