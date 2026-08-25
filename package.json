@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node server/server.js",
     "dev": "nodemon --env-file=.env server/server.js",
-    "seed:doctors": "node server/seed/seedDoctors.js"
+    "seed:doctors": "node server/seed/seedDoctors.js",
+    "seed:hospitals": "node server/scripts/seedHospitals.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

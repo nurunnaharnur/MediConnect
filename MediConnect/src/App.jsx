@@ -21,6 +21,8 @@ import DoctorReportDetail from './pages/DoctorReportDetail';
 import SymptomChecker from './pages/SymptomChecker';
 import DietFitness from './pages/DietFitness';
 import BloodPressure from './pages/BloodPressure';
+import HospitalFinder from './pages/HospitalFinder';
+import DoctorProfile from './pages/DoctorProfile';
 import Layout from './components/Layout';
 import { getToken, getUser } from './api/authApi';
 
@@ -94,6 +96,8 @@ function App() {
           <Route path="/symptom-checker" element={<SymptomChecker />} />
           <Route path="/diet-fitness" element={<DietFitness />} />
           <Route path="/blood-pressure" element={<BloodPressure />} />
+          <Route path="/hospitals" element={<HospitalFinder />} />
+          <Route path="/doctors/:id" element={<DoctorProfile />} />
           <Route path="/reports/generate" element={<GenerateReport />} />
           <Route path="/reports/history" element={<ReportHistory />} />
           <Route path="/symptoms" element={<SymptomHistory />} />

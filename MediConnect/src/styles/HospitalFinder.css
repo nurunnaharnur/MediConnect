@@ -1,0 +1,652 @@
+.hf-page {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: #F5F7F6;
+  min-height: 100vh;
+  padding: 2.5rem 1.5rem 5rem;
+  color: #16241F;
+}
+
+.hf-shell {
+  max-width: 1120px;
+  margin: 0 auto;
+}
+
+.hf-eyebrow {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #146356;
+  margin: 0 0 0.4rem;
+}
+
+.hf-header h1 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+  color: #16241F;
+}
+
+.hf-subtext {
+  color: #5B6B65;
+  font-size: 0.95rem;
+  margin: 0 0 2rem;
+  line-height: 1.5;
+}
+
+/* Location Box */
+.hf-location-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  border: 1px solid #E7ECEA;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  margin-bottom: 1.5rem;
+}
+
+.hf-loc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.hf-loc-title {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.hf-loc-icon {
+  font-size: 1.8rem;
+}
+
+.hf-loc-title h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  margin: 0;
+  color: #146356;
+}
+
+.hf-loc-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  color: #5B6B65;
+  margin: 0.15rem 0 0;
+}
+
+.hf-btn-gps {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: #146356;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  padding: 0.65rem 1.25rem;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(20, 99, 86, 0.2);
+  transition: all 0.15s ease;
+}
+
+.hf-btn-gps:hover {
+  background: #0E493F;
+}
+
+.hf-btn-gps:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Presets */
+.hf-presets-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #F0F4F2;
+}
+
+.hf-preset-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5B6B65;
+}
+
+.hf-preset-chip {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #F1F4F3;
+  color: #374151;
+  border: 1px solid #DDE4E2;
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hf-preset-chip:hover {
+  background: #E4EFEC;
+  border-color: #146356;
+  color: #146356;
+}
+
+.hf-preset-chip.active {
+  background: #146356;
+  color: #FFFFFF;
+  border-color: #146356;
+}
+
+/* Manual Form */
+.hf-manual-form {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.hf-manual-inputs {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 280px;
+}
+
+.hf-input, .hf-select {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid #DDE4E2;
+  background: #F8FAFA;
+  color: #16241F;
+  width: 100%;
+}
+
+.hf-input:focus, .hf-select:focus {
+  outline: 2px solid #146356;
+  background: #FFFFFF;
+}
+
+.hf-btn-manual {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: transparent;
+  border: 1px solid #DDE4E2;
+  border-radius: 10px;
+  padding: 0.6rem 1.1rem;
+  color: #16241F;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hf-btn-manual:hover {
+  background: #EAF3F1;
+  border-color: #146356;
+}
+
+/* Filters Bar */
+.hf-filters-bar {
+  background: #FFFFFF;
+  border-radius: 18px;
+  border: 1px solid #E7ECEA;
+  padding: 1.25rem 1.5rem;
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.02);
+}
+
+.hf-filter-field {
+  flex: 1;
+  min-width: 180px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.hf-filter-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #5B6B65;
+}
+
+.hf-btn-search {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  background: #146356;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.4rem;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+
+.hf-btn-search:hover {
+  background: #0E493F;
+}
+
+/* Alerts */
+.hf-alert-warning {
+  margin-top: 0.75rem;
+  padding: 0.65rem 1rem;
+  background: #FEF3C7;
+  border: 1px solid #FDE68A;
+  border-radius: 10px;
+  font-size: 0.82rem;
+  color: #92400E;
+}
+
+.hf-alert-error {
+  padding: 0.85rem 1.25rem;
+  background: #FEE2E2;
+  border: 1px solid #FCA5A5;
+  border-radius: 12px;
+  font-size: 0.88rem;
+  color: #B91C1C;
+  margin-bottom: 1.5rem;
+}
+
+/* Results Grid */
+.hf-results-section {
+  margin-top: 1rem;
+}
+
+.hf-results-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.25rem;
+}
+
+.hf-results-header h3 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.3rem;
+  margin: 0;
+  color: #16241F;
+}
+
+.hf-results-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  background: #E4EFEC;
+  color: #146356;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+}
+
+.hf-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.hf-hospital-card {
+  background: #FFFFFF;
+  border-radius: 18px;
+  border: 1px solid #E7ECEA;
+  padding: 1.5rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+  display: flex;
+  flex-direction: column;
+}
+
+.hf-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+.hf-hospital-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.3rem;
+  color: #146356;
+}
+
+.hf-hospital-address {
+  font-size: 0.82rem;
+  color: #4B5563;
+  margin: 0 0 0.2rem;
+}
+
+.hf-hospital-phone {
+  font-size: 0.78rem;
+  color: #5B6B65;
+  margin: 0;
+}
+
+.hf-card-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.hf-distance-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: #E0F2FE;
+  color: #0369A1;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.hf-rating-badge {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #FEF3C7;
+  color: #92400E;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.hf-specialties-wrap {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+  flex: 1;
+}
+
+.hf-specialty-tag {
+  font-size: 0.72rem;
+  background: #F3F4F6;
+  color: #374151;
+  padding: 0.25rem 0.55rem;
+  border-radius: 6px;
+}
+
+.hf-card-footer {
+  border-top: 1px solid #F0F4F2;
+  padding-top: 0.85rem;
+}
+
+.hf-btn-view-doctors {
+  width: 100%;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  background: #F8FAFA;
+  color: #146356;
+  border: 1px solid #DDE4E2;
+  border-radius: 10px;
+  padding: 0.55rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hf-btn-view-doctors:hover, .hf-btn-view-doctors.active {
+  background: #146356;
+  color: #FFFFFF;
+  border-color: #146356;
+}
+
+/* Doctors Drawer */
+.hf-doctors-drawer {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed #DDE4E2;
+}
+
+.hf-doctors-drawer h5 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  margin: 0 0 0.65rem;
+  color: #16241F;
+}
+
+.hf-doctors-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.hf-doctor-row {
+  background: #F8FAFA;
+  border: 1px solid #E7ECEA;
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.hf-doctor-row:hover {
+  background: #EAF3F1;
+  border-color: #146356;
+  transform: translateX(2px);
+}
+
+.hf-doc-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.hf-doc-name {
+  font-size: 0.85rem;
+  color: #146356;
+}
+
+.hf-doc-spec {
+  font-size: 0.75rem;
+  color: #374151;
+}
+
+.hf-doc-exp {
+  font-size: 0.7rem;
+  color: #6B7280;
+}
+
+.hf-doc-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+
+.hf-doc-rating {
+  font-size: 0.75rem;
+  font-weight: bold;
+  color: #92400E;
+}
+
+.hf-doc-cta {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #146356;
+}
+
+/* Doctor Profile Page */
+.hf-back-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #146356;
+  text-decoration: none;
+  margin-bottom: 1.5rem;
+}
+
+.hf-profile-card {
+  background: #FFFFFF;
+  border-radius: 20px;
+  border: 1px solid #E7ECEA;
+  padding: 2.25rem;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04);
+}
+
+.hf-profile-header {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  border-bottom: 1px solid #E7ECEA;
+  padding-bottom: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.hf-profile-avatar {
+  font-size: 4rem;
+  background: #E4EFEC;
+  width: 90px;
+  height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 22px;
+}
+
+.hf-profile-main-info {
+  flex: 1;
+}
+
+.hf-profile-name {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+  color: #16241F;
+}
+
+.hf-profile-specialty {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #146356;
+  margin: 0.2rem 0;
+}
+
+.hf-profile-exp {
+  font-size: 0.85rem;
+  color: #5B6B65;
+  margin: 0.35rem 0 0;
+}
+
+.hf-profile-section {
+  margin-bottom: 1.75rem;
+}
+
+.hf-profile-section h4 {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.05rem;
+  margin: 0 0 0.65rem;
+  color: #16241F;
+}
+
+.hf-profile-bio {
+  font-size: 0.92rem;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.hf-affiliated-hospital {
+  background: #F8FAFA;
+  border: 1px solid #E7ECEA;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+}
+
+.hf-affiliated-hospital strong {
+  font-size: 0.95rem;
+  color: #146356;
+}
+
+.hf-affiliated-hospital p {
+  font-size: 0.85rem;
+  color: #4B5563;
+  margin: 0.25rem 0 0;
+}
+
+.hf-btn-book-profile {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  background: #146356;
+  color: #FFFFFF;
+  border: none;
+  border-radius: 999px;
+  padding: 0.55rem 1.25rem;
+  cursor: pointer;
+}
+
+.hf-btn-book-profile:hover {
+  background: #0E493F;
+}
+
+.hf-slots-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.hf-slot-card {
+  background: #F8FAFA;
+  border: 1px solid #E7ECEA;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.hf-slot-day {
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: #146356;
+}
+
+.hf-slot-time {
+  font-size: 0.82rem;
+  color: #374151;
+}
+
+/* Spinner */
+.hf-loading-spinner {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  border: 3px solid #E4EFEC;
+  border-top-color: #146356;
+  border-radius: 50%;
+  animation: hf-spin 0.8s linear infinite;
+}
+
+@keyframes hf-spin {
+  to { transform: rotate(360deg); }
+}
+
+.hf-loading-state, .hf-empty-state {
+  text-align: center;
+  padding: 3.5rem 1rem;
+  color: #5B6B65;
+}
+
+@media (max-width: 768px) {
+  .hf-profile-header {
+    flex-direction: column;
+    text-align: center;
+  }
+  .hf-card-top {
+    flex-direction: column;
+  }
+}

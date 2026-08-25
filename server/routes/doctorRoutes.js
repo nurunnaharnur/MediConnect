@@ -1,19 +1,16 @@
 import express from 'express';
 import {
   listDoctors,
+  getDoctors,
+  getDoctorById,
   getDoctorPatients,
   getPatientFullRecord,
   getDoctorAppointments,
-  updateDoctorAppointment
+  updateDoctorAppointment,
 } from '../controllers/doctorController.js';
 import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
-
-router.use(protect);
-
-// Publicly available to all logged-in users (patients can list doctors)
-router.get('/', listDoctors);
 
 // Doctor authorization check middleware
 const requireDoctor = (req, res, next) => {
@@ -23,10 +20,24 @@ const requireDoctor = (req, res, next) => {
   return res.status(403).json({ message: 'Access denied: Healthcare provider authorization required.' });
 };
 
-// Doctor-only routes
-router.get('/patients', requireDoctor, getDoctorPatients);
-router.get('/patient/:id', requireDoctor, getPatientFullRecord);
-router.get('/appointments', requireDoctor, getDoctorAppointments);
-router.patch('/appointments/:id', requireDoctor, updateDoctorAppointment);
+// Public Doctor Discovery Endpoints (FR-10, FR-11)
+router.get('/', (req, res, next) => {
+  if (req.query.hospitalId || req.query.specialty || req.query.minRating) {
+    return getDoctors(req, res, next);
+  }
+  // If no query parameters, return registered doctor list
+  return getDoctors(req, res, next);
+});
+
+router.get('/list-all', listDoctors);
+
+// Doctor-only routes (require authentication + doctor role)
+router.get('/patients', protect, requireDoctor, getDoctorPatients);
+router.get('/patient/:id', protect, requireDoctor, getPatientFullRecord);
+router.get('/appointments', protect, requireDoctor, getDoctorAppointments);
+router.patch('/appointments/:id', protect, requireDoctor, updateDoctorAppointment);
+
+// Doctor detail by ID
+router.get('/:id', getDoctorById);
 
 export default router;

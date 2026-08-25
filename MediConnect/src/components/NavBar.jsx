@@ -4,6 +4,7 @@ import '../styles/NavBar.css';
 
 const PATIENT_LINKS = [
   { to: '/dashboard', label: '📊 Dashboard' },
+  { to: '/hospitals', label: '🏥 Find Hospitals' },
   { to: '/symptom-checker', label: '🩺 Symptom Checker' },
   { to: '/diet-fitness', label: '🥗 Diet & Fitness' },
   { to: '/blood-pressure', label: '🫀 Blood Pressure' },

@@ -604,6 +604,28 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Card 3B: Hospital & Doctor Discovery */}
+          <div
+            className="dash-card"
+            onClick={() => navigate('/hospitals')}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="dash-card-header">
+              <div className="dash-icon-box" style={{ background: '#E0F2FE', color: '#0369A1' }}>🏥</div>
+              <span className="dash-chip" style={{ background: '#E0F2FE', color: '#0369A1' }}>Geo Discovery</span>
+            </div>
+            <h3>Nearby Hospitals & Doctors</h3>
+            <p>
+              Find nearby medical facilities via GPS, filter by medical department, distance, and patient ratings, and inspect weekly doctor schedules.
+            </p>
+            <div className="dash-card-footer">
+              <span className="dash-card-cta" style={{ color: '#0369A1' }}>
+                Find Nearby Facilities →
+              </span>
+            </div>
+          </div>
+
           {/* Card 4: Menstruation Cycle Tracker */}
           <div
             className="dash-card dash-card-cycle"

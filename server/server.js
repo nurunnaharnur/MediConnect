@@ -19,6 +19,7 @@ import diagnosisRoutes from './routes/diagnosisRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import symptomRoutes from './routes/symptomRoutes.js';
 import symptomCheckRoutes from './routes/symptomCheckRoutes.js';
+import hospitalRoutes from './routes/hospitalRoutes.js';
 import { initReminderScheduler } from './services/notificationService.js';
 
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/mood', moodRoutes);
 app.use('/api/wellbeing', wellbeingRoutes);
 app.use('/api/doctor', doctorRoutes);
 app.use('/api/doctors', doctorRoutes);
+app.use('/api/hospitals', hospitalRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/cycle', cycleRoutes);
 app.use('/api/cycles', menstrualCycleRoutes);
