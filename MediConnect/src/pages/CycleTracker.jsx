@@ -710,6 +710,14 @@ export default function CycleTracker() {
                 </div>
               </div>
             </div>
+
+            {/* PCOS Clinical Disclaimer Highlight Banner */}
+            <div style={{ marginTop: '1.75rem', padding: '1.1rem 1.35rem', background: '#FEF3C7', border: '1px solid #FDE68A', borderRadius: '16px', color: '#92400E', fontSize: '0.88rem', lineHeight: '1.5', display: 'flex', alignItems: 'flex-start', gap: '0.65rem' }}>
+              <span style={{ fontSize: '1.2rem', lineHeight: 1 }}>⚠️</span>
+              <div>
+                <strong>Medical Advisory Notice:</strong> This is only a screening flag based on the information you have entered. It is not a medical diagnosis. Please discuss any concerns with a gynecologist or qualified healthcare provider.
+              </div>
+            </div>
           </div>
         )}
 

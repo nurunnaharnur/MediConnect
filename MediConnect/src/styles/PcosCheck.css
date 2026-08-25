@@ -74,6 +74,6 @@
 .pcos-page .pcos-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
 
 .pcos-page .pcos-disclaimer {
-  margin-top: 1.75rem; font-size: 0.82rem; color: var(--muted); background: var(--surface);
-  border: 1px dashed var(--rail); border-radius: 12px; padding: 1rem 1.1rem; line-height: 1.5;
+  margin-top: 1.75rem; font-size: 0.85rem; color: #92400E; background: #FEF3C7;
+  border: 1px solid #FDE68A; border-radius: 14px; padding: 1.1rem 1.25rem; line-height: 1.5;
 }
