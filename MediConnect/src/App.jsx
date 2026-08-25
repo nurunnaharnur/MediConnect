@@ -18,6 +18,7 @@ import ShareReport from './pages/ShareReport';
 import MyDiagnoses from './pages/MyDiagnoses';
 import DoctorSharedReports from './pages/DoctorSharedReports';
 import DoctorReportDetail from './pages/DoctorReportDetail';
+import Layout from './components/Layout';
 import { getToken, getUser } from './api/authApi';
 
 // Guard for Patient-accessible routes
@@ -63,7 +64,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<RootRedirect />} />
-        
+
         {/* Patient Auth */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -74,127 +75,38 @@ function App() {
 
         {/* Patient Protected Routes */}
         <Route
-          path="/dashboard"
           element={
             <RequirePatientAuth>
-              <Dashboard />
+              <Layout />
             </RequirePatientAuth>
           }
-        />
-        <Route
-          path="/reminders"
-          element={
-            <RequirePatientAuth>
-              <Reminders />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/mental-wellbeing"
-          element={
-            <RequirePatientAuth>
-              <MentalWellbeing />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/appointments"
-          element={
-            <RequirePatientAuth>
-              <Appointments />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/reports/generate"
-          element={
-            <RequirePatientAuth>
-              <GenerateReport />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/reports/history"
-          element={
-            <RequirePatientAuth>
-              <ReportHistory />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/symptoms"
-          element={
-            <RequirePatientAuth>
-              <SymptomHistory />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/cycles"
-          element={
-            <RequirePatientAuth>
-              <CycleTracker />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/cycles/prediction"
-          element={
-            <RequirePatientAuth>
-              <CyclePrediction />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/pcos"
-          element={
-            <RequirePatientAuth>
-              <PcosCheck />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/reports/share"
-          element={
-            <RequirePatientAuth>
-              <ShareReport />
-            </RequirePatientAuth>
-          }
-        />
-        <Route
-          path="/diagnoses"
-          element={
-            <RequirePatientAuth>
-              <MyDiagnoses />
-            </RequirePatientAuth>
-          }
-        />
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/reminders" element={<Reminders />} />
+          <Route path="/mental-wellbeing" element={<MentalWellbeing />} />
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/pcos" element={<PcosCheck />} />
+          <Route path="/cycles" element={<CycleTracker />} />
+          <Route path="/cycles/prediction" element={<CyclePrediction />} />
+          <Route path="/reports/generate" element={<GenerateReport />} />
+          <Route path="/reports/history" element={<ReportHistory />} />
+          <Route path="/symptoms" element={<SymptomHistory />} />
+          <Route path="/reports/share" element={<ShareReport />} />
+          <Route path="/diagnoses" element={<MyDiagnoses />} />
+        </Route>
 
         {/* Doctor Protected Routes */}
         <Route
-          path="/doctor-dashboard"
           element={
             <RequireDoctorAuth>
-              <DoctorDashboard />
+              <Layout />
             </RequireDoctorAuth>
           }
-        />
-        <Route
-          path="/doctor/reports"
-          element={
-            <RequireDoctorAuth>
-              <DoctorSharedReports />
-            </RequireDoctorAuth>
-          }
-        />
-        <Route
-          path="/doctor/reports/:id"
-          element={
-            <RequireDoctorAuth>
-              <DoctorReportDetail />
-            </RequireDoctorAuth>
-          }
-        />
+        >
+          <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
+          <Route path="/doctor/reports" element={<DoctorSharedReports />} />
+          <Route path="/doctor/reports/:id" element={<DoctorReportDetail />} />
+        </Route>
 
         {/* Fallback */}
         <Route path="*" element={<RootRedirect />} />

@@ -628,7 +628,47 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Card 5: AI Health Assistant */}
+          {/* Card 5: PCOS Tracker & Pattern Screening */}
+          <div
+            className="dash-card"
+            onClick={() => navigate('/pcos')}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="dash-card-header">
+              <div className="dash-icon-box" style={{ background: '#FBE7EE', color: '#A8305C' }}>🔬</div>
+              <span className="dash-chip" style={{ background: '#FBE7EE', color: '#A8305C' }}>PCOS Screening</span>
+            </div>
+            <h3>PCOS Tracker & Pattern Check</h3>
+            <p>
+              Screen for PCOS risk patterns (acne, excess hair growth, hair thinning, weight changes) and track hormonal signs with algorithmic clinical indicators.
+            </p>
+            <div className="dash-card-footer">
+              <span className="dash-card-cta" style={{ color: '#A8305C' }}>Open PCOS Screening Hub →</span>
+            </div>
+          </div>
+
+          {/* Card 6: Clinical Reports & Doctor Diagnoses */}
+          <div
+            className="dash-card"
+            onClick={() => navigate('/reports/generate')}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="dash-card-header">
+              <div className="dash-icon-box" style={{ background: '#E4EFEC', color: '#146356' }}>📄</div>
+              <span className="dash-chip" style={{ background: '#E4EFEC', color: '#146356' }}>Clinical Reports</span>
+            </div>
+            <h3>Health Reports & Diagnoses</h3>
+            <p>
+              Generate structured symptom health reports, download clinical PDF records, share reports with physicians, and view doctor diagnoses.
+            </p>
+            <div className="dash-card-footer">
+              <span className="dash-card-cta" style={{ color: '#146356' }}>Generate / View Reports →</span>
+            </div>
+          </div>
+
+          {/* Card 7: AI Health Assistant */}
           <div
             className="dash-card"
             onClick={() => setActiveModal('ai')}
@@ -648,7 +688,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Card 6: Health Profile & Records */}
+          {/* Card 8: Health Profile & Records */}
           <div
             className="dash-card"
             onClick={() => setActiveModal('profile')}
@@ -1512,8 +1552,39 @@ export default function Dashboard() {
               <strong>Educational Disclaimer:</strong> Cycle predictions and ovulation windows are algorithmic estimations for personal self-awareness and wellness planning. They should not be used as a primary method of contraception or medical diagnosis.
             </div>
 
-            <div className="dash-modal-actions" style={{ marginTop: '1.25rem' }}>
-              <button className="dash-btn-primary" onClick={() => setActiveModal(null)}>
+            <div className="dash-modal-actions" style={{ marginTop: '1.25rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                className="dash-btn-secondary"
+                onClick={() => {
+                  setActiveModal(null);
+                  navigate('/pcos');
+                }}
+                style={{ color: '#A8305C', borderColor: '#FDA4AF' }}
+              >
+                🔬 PCOS Pattern Check
+              </button>
+              <button
+                type="button"
+                className="dash-btn-secondary"
+                onClick={() => {
+                  setActiveModal(null);
+                  navigate('/cycles/prediction');
+                }}
+              >
+                🔮 Cycle Predictions
+              </button>
+              <button
+                type="button"
+                className="dash-btn-secondary"
+                onClick={() => {
+                  setActiveModal(null);
+                  navigate('/cycles');
+                }}
+              >
+                📜 Full Cycle History
+              </button>
+              <button className="dash-btn-primary" style={{ marginLeft: 'auto' }} onClick={() => setActiveModal(null)}>
                 Close
               </button>
             </div>

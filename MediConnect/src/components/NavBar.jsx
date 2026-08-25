@@ -1,38 +1,47 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { clearSession, getUser } from '../api/authApi';
 import '../styles/NavBar.css';
 
 const PATIENT_LINKS = [
-  { to: '/dashboard', label: 'Reminders' },
-  { to: '/appointments', label: 'Appointments' },
-  { to: '/reports/generate', label: 'Generate Report' },
-  { to: '/reports/history', label: 'Report History' },
-  { to: '/symptoms', label: 'Symptom History' },
-  { to: '/cycles', label: 'Cycle Tracker' },
-  { to: '/cycles/prediction', label: 'Cycle Prediction' },
-  { to: '/pcos', label: 'PCOS Check' },
-  { to: '/reports/share', label: 'Share Report' },
-  { to: '/diagnoses', label: 'My Diagnoses' },
+  { to: '/dashboard', label: '📊 Dashboard' },
+  { to: '/reminders', label: '💊 Reminders' },
+  { to: '/mental-wellbeing', label: '🧠 Mental Health' },
+  { to: '/appointments', label: '📅 Appointments' },
+  { to: '/pcos', label: '🌸 PCOS Tracker' },
+  { to: '/cycles', label: '🗓️ Cycle Tracker' },
+  { to: '/cycles/prediction', label: '🔮 Predictions' },
+  { to: '/reports/generate', label: '📄 Health Report' },
+  { to: '/reports/history', label: '📜 Report History' },
+  { to: '/symptoms', label: '🩺 Symptoms' },
+  { to: '/reports/share', label: '🤝 Share Report' },
+  { to: '/diagnoses', label: '📋 Diagnoses' },
 ];
 
 const DOCTOR_LINKS = [
-  { to: '/doctor/reports', label: 'Shared Reports' },
+  { to: '/doctor-dashboard', label: '🩺 Doctor Dashboard' },
+  { to: '/doctor/reports', label: '📋 Shared Patient Reports' },
 ];
 
 export default function NavBar() {
   const navigate = useNavigate();
   const user = getUser();
-  const links = user?.role === 'doctor' ? DOCTOR_LINKS : PATIENT_LINKS;
+  const isDoctor = user?.role === 'doctor';
+  const links = isDoctor ? DOCTOR_LINKS : PATIENT_LINKS;
+  const homePath = isDoctor ? '/doctor-dashboard' : '/dashboard';
 
   function handleLogout() {
     clearSession();
-    navigate('/login');
+    navigate(isDoctor ? '/doctor-login' : '/login');
   }
 
   return (
     <nav className="mc-navbar">
       <div className="mc-navbar-inner">
-        <span className="mc-navbar-brand">MediConnect</span>
+        <Link to={homePath} className="mc-navbar-brand">
+          <span className="mc-brand-icon">{isDoctor ? '🩺' : '💊'}</span>
+          <span>MediConnect</span>
+        </Link>
+        
         <div className="mc-navbar-links">
           {links.map((link) => (
             <NavLink
@@ -44,9 +53,15 @@ export default function NavBar() {
             </NavLink>
           ))}
         </div>
-        <button className="mc-navbar-logout" onClick={handleLogout}>
-          Log out
-        </button>
+
+        <div className="mc-navbar-right">
+          <span className="mc-navbar-user">
+            {user?.name ? user.name.split(' ')[0] : (isDoctor ? 'Doctor' : 'Patient')}
+          </span>
+          <button className="mc-navbar-logout" onClick={handleLogout}>
+            Log out
+          </button>
+        </div>
       </div>
     </nav>
   );
