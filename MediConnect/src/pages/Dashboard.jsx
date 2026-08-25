@@ -636,14 +636,14 @@ export default function Dashboard() {
             <div className="dash-card-header">
               <div className="dash-icon-box cycle">🌸</div>
               <span className="dash-chip cycle">
-                {cycleData?.phase ? cycleData.phase : 'Menstruation & PCOS'}
+                {cycleData?.phase ? cycleData.phase : 'Flo Cycle &amp; PCOS'}
               </span>
             </div>
-            <h3>Menstruation Tracker</h3>
+            <h3>Menstruation &amp; PCOS Tracker</h3>
             <p>
               {cycleData?.phase
-                ? `Currently in ${cycleData.phase} (Day ${cycleData.currentCycleDay} of ${cycleData.cycleLength}). Next period in ~${cycleData.daysUntilNext} days. Includes period predictions and PCOS pattern screening.`
-                : 'Track period cycle phases, predict fertile windows, log daily flow, and screen for PCOS hormonal patterns.'}
+                ? `Currently in ${cycleData.phase} (Day ${cycleData.currentCycleDay} of ${cycleData.cycleLength}). Ovulation on Day ~${cycleData.ovulationDay || 14}. Track bloating, headaches, fertile windows, and screen PCOS risk.`
+                : 'Track period cycle phases, ovulation &amp; fertile windows, log daily bloating and headaches, and screen for PCOS hormonal patterns.'}
             </p>
             <div className="dash-card-footer">
               <span className="dash-card-cta">Open Menstruation Hub →</span>
