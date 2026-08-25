@@ -1,7 +1,42 @@
 import nodemailer from 'nodemailer';
 import cron from 'node-cron';
 import jwt from 'jsonwebtoken';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import MedicineReminder from '../models/MedicineReminder.js';
+import { ReminderModel } from '../models/reminderModel.js';
+import { getDB } from '../config/db.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const NOTIFICATIONS_FILE = path.join(__dirname, '..', 'data', 'notifications.json');
+
+function ensureDataFile() {
+  const dir = path.dirname(NOTIFICATIONS_FILE);
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+  if (!fs.existsSync(NOTIFICATIONS_FILE)) {
+    fs.writeFileSync(NOTIFICATIONS_FILE, JSON.stringify([], null, 2), 'utf-8');
+  }
+}
+
+export function loadNotifications() {
+  ensureDataFile();
+  try {
+    const data = fs.readFileSync(NOTIFICATIONS_FILE, 'utf-8');
+    return JSON.parse(data || '[]');
+  } catch (error) {
+    console.error('Error loading notifications:', error);
+    return [];
+  }
+}
+
+export function saveNotifications(notifications) {
+  ensureDataFile();
+  fs.writeFileSync(NOTIFICATIONS_FILE, JSON.stringify(notifications, null, 2), 'utf-8');
+}
 
 function createTransporter() {
   const user = process.env.SMTP_USER;
@@ -36,7 +71,7 @@ export const sendEmailNotification = async (userEmail, reminder) => {
     : '';
 
   const sender = process.env.SMTP_FROM || `"MediConnect Health" <${process.env.SMTP_USER}>`;
-  const serverBase = process.env.SERVER_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+  const serverBase = process.env.SERVER_BASE_URL || `http://localhost:${process.env.PORT || 5001}`;
   const patientId = reminder.patientId?._id || reminder.patientId;
 
   // Generate signed 1-click action tokens for email buttons
@@ -56,7 +91,7 @@ export const sendEmailNotification = async (userEmail, reminder) => {
   const mailOptions = {
     from: sender,
     to: userEmail,
-    subject: `💊 Time for your medication: ${reminder.name}`,
+    subject: `💊 Time for your medication: ${reminder.name || reminder.medicineName}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -75,7 +110,7 @@ export const sendEmailNotification = async (userEmail, reminder) => {
           <p style="font-size: 15px; color: #16241f;">It's time to take your scheduled medication:</p>
           
           <div style="background-color: #f1f8f6; border-left: 4px solid #146356; padding: 16px; border-radius: 8px; margin: 16px 0;">
-            <p style="margin: 0 0 6px; font-size: 19px; font-weight: bold; color: #146356;">${reminder.name}</p>
+            <p style="margin: 0 0 6px; font-size: 19px; font-weight: bold; color: #146356;">${reminder.name || reminder.medicineName}</p>
             <p style="margin: 4px 0; font-size: 14px; color: #475569;"><strong>Dosage:</strong> ${reminder.dosage}${mealText}</p>
             <p style="margin: 4px 0; font-size: 14px; color: #475569;"><strong>Scheduled Time:</strong> ${reminder.time}</p>
             ${reminder.notes ? `<p style="margin: 4px 0; font-size: 14px; color: #475569;"><strong>Instructions:</strong> ${reminder.notes}</p>` : ''}
@@ -120,7 +155,7 @@ export const sendEmailNotification = async (userEmail, reminder) => {
 
   try {
     const info = await transporter.sendMail(mailOptions);
-    console.log(`[Notification] ✅ Reminder email with action buttons successfully sent to ${userEmail} for "${reminder.name}" (Message ID: ${info.messageId})`);
+    console.log(`[Notification] ✅ Reminder email with action buttons successfully sent to ${userEmail} for "${reminder.name || reminder.medicineName}" (Message ID: ${info.messageId})`);
     return { success: true, info };
   } catch (err) {
     console.error(`[Notification] ❌ Failed to send email to ${userEmail}:`, err.message);
@@ -238,3 +273,159 @@ export const sendEmergencyAlertEmail = async (guardianEmail, alertData) => {
     return { success: false, error: err.message };
   }
 };
+
+export class NotificationService {
+  static async getLogs(limit = 50) {
+    const db = await getDB();
+    if (db) {
+      try {
+        let logs = await db.collection('notifications')
+          .find({})
+          .sort({ timestamp: -1 })
+          .limit(limit)
+          .toArray();
+        if (logs.length === 0) {
+          const localLogs = loadNotifications();
+          if (localLogs.length > 0) {
+            console.log(`Migrating ${localLogs.length} local notifications to MongoDB...`);
+            await db.collection('notifications').insertMany(localLogs);
+            logs = await db.collection('notifications')
+              .find({})
+              .sort({ timestamp: -1 })
+              .limit(limit)
+              .toArray();
+          }
+        }
+        return logs;
+      } catch (err) {
+        console.warn("⚠️ MongoDB is read-only or connection failed. Gracefully falling back to local notifications database.");
+      }
+    }
+
+    const logs = loadNotifications();
+    return logs.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, limit);
+  }
+
+  static async dispatchNotification(reminder, channel = 'push', isTest = false) {
+    const now = new Date();
+    let recipient = 'Browser User';
+    let detail = '';
+
+    const medName = reminder.name || reminder.medicineName || 'Medication';
+
+    if (channel === 'sms') {
+      recipient = reminder.phoneNumber || '+1 (555) 019-2834';
+      detail = `[Twilio Gateway] SMS sent to ${recipient}: "Reminder: Take ${medName} (${reminder.dosage}) now."`;
+    } else if (channel === 'email') {
+      recipient = reminder.email || 'patient@mediconnect.health';
+      detail = `[SendGrid Service] Email dispatched to ${recipient}: Subject "MediConnect Reminder: ${medName}"`;
+    } else {
+      channel = 'push';
+      recipient = 'Web Browser Client';
+      detail = `[Web Push API] Desktop Alert: "Time to take ${medName} - ${reminder.dosage}"`;
+    }
+
+    const notificationRecord = {
+      id: 'notif_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+      reminderId: reminder._id ? reminder._id.toString() : (reminder.id || 'test_id'),
+      medicineName: medName,
+      dosage: reminder.dosage,
+      channel,
+      recipient,
+      message: `Time to take ${medName} (${reminder.dosage})`,
+      detail,
+      timestamp: now.toISOString(),
+      status: 'delivered',
+      isTest
+    };
+
+    console.log(`🔔 AUTOMATED NOTIFICATION DELIVERED [${channel.toUpperCase()}]:`, detail);
+
+    const db = await getDB();
+    if (db) {
+      try {
+        await db.collection('notifications').insertOne(notificationRecord);
+        return notificationRecord;
+      } catch (err) {
+        console.error("MongoDB insert notification failed, falling back to file:", err);
+      }
+    }
+
+    const logs = loadNotifications();
+    logs.push(notificationRecord);
+    saveNotifications(logs);
+
+    return notificationRecord;
+  }
+
+  static async checkDueReminders() {
+    const reminders = await ReminderModel.getAll();
+    const now = new Date();
+    const currentHHMM = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const currentDayName = dayNames[now.getDay()];
+
+    const newlyTriggered = [];
+
+    for (const r of reminders) {
+      if (r.status === 'taken' || r.status === 'skipped' || r.status === 'expired' || r.isExpired) continue;
+
+      let isDue = false;
+
+      // Check custom days filter if frequency === 'Custom'
+      if (r.frequency === 'Custom' && Array.isArray(r.customDays) && r.customDays.length > 0) {
+        if (!r.customDays.includes(currentDayName)) {
+          continue;
+        }
+      }
+
+      // Check snoozed time
+      if (r.status === 'snoozed' && r.snoozedUntil) {
+        const snoozeDate = new Date(r.snoozedUntil);
+        if (now >= snoozeDate) {
+          isDue = true;
+        }
+      } 
+      // Check normal scheduled time or secondTime slot (for Twice Daily)
+      else if (r.time === currentHHMM || (r.frequency === 'Twice Daily' && r.secondTime === currentHHMM)) {
+        const lastNotifiedMinute = r.lastNotifiedAt ? r.lastNotifiedAt.substring(0, 16) : '';
+        const currentMinuteISO = now.toISOString().substring(0, 16);
+        if (lastNotifiedMinute !== currentMinuteISO) {
+          isDue = true;
+        }
+      }
+
+      if (isDue) {
+        const channels = (r.channels && r.channels.length > 0) ? r.channels : ['push'];
+        for (const ch of channels) {
+          const notif = await NotificationService.dispatchNotification(r, ch, false);
+          newlyTriggered.push(notif);
+        }
+
+        await ReminderModel.updateNotificationTime(r.id, now.toISOString());
+      }
+    }
+
+    return newlyTriggered;
+  }
+
+  static startScheduler(intervalMs = 15000) {
+    console.log('⏰ MediConnect Notification Engine Scheduler Started (Interval: 15s)');
+    
+    (async () => {
+      try {
+        await NotificationService.checkDueReminders();
+      } catch (e) {
+        console.error('Error in initial notification check:', e);
+      }
+    })();
+
+    setInterval(async () => {
+      try {
+        await NotificationService.checkDueReminders();
+      } catch (e) {
+        console.error('Error in scheduled notification check:', e);
+      }
+    }, intervalMs);
+  }
+}

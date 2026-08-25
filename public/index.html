@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediConnect | Feature 16: Recurring & Auto-Expiring Schedules</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="background-globes">
+    <div class="globe globe-1"></div>
+    <div class="globe globe-2"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- Header -->
+    <header class="navbar">
+      <div class="logo-area">
+        <div class="logo-icon">💊</div>
+        <div class="logo-text">
+          <h1>MediConnect</h1>
+          <span class="subtitle">Feature 16: Recurring & Auto-Expiring Medicine Schedules</span>
+        </div>
+      </div>
+      <div class="nav-badges">
+        <span class="badge badge-pulse">● System Live</span>
+        <span class="badge badge-role">Patient Dashboard</span>
+      </div>
+    </header>
+
+    <!-- Browser Push Banner -->
+    <div id="pushPermissionBanner" class="push-banner">
+      <div class="banner-info">
+        <span class="banner-icon">🔔</span>
+        <div>
+          <strong>Enable Desktop Web Push Notifications</strong>
+          <p>Get real-time automated browser popups at exact scheduled dosage times.</p>
+        </div>
+      </div>
+      <div class="banner-actions">
+        <span id="pushStatusBadge" class="status-pill disabled">Push Permission: Default</span>
+        <button id="enablePushBtn" class="btn btn-sm btn-accent">Enable Push Notifications</button>
+      </div>
+    </div>
+
+    <!-- Tab Controls -->
+    <div class="dashboard-tabs">
+      <button class="tab-link active" data-tab="meds-tab">💊 Medicine Reminders</button>
+      <button class="tab-link" data-tab="symptoms-tab">🩺 Symptom Checker</button>
+      <button class="tab-link" data-tab="diet-tab">🍏 Diet & Fitness</button>
+      <button class="tab-link" data-tab="vitals-tab">📊 Cardiovascular Health</button>
+    </div>
+
+    <!-- Tab 1: Medicine Reminders -->
+    <div id="meds-tab" class="tab-content active">
+      <!-- Main Content Grid -->
+      <main class="content-grid">
+      <!-- Creation Form Card -->
+      <section class="card form-card">
+        <div class="card-header">
+          <h2>⏰ Create Medicine Reminder</h2>
+          <p>Configure recurring schedules, course duration, and multi-channel alerts.</p>
+        </div>
+
+        <form id="reminderForm" class="reminder-form">
+          <div class="form-group">
+            <label for="medicineName">Medicine Name & Strength <span class="req">*</span></label>
+            <input type="text" id="medicineName" placeholder="e.g. Paracetamol 500mg, Amoxicillin" required>
+          </div>
+
+          <div class="form-group">
+            <label for="dosage">Dosage Instructions <span class="req">*</span></label>
+            <input type="text" id="dosage" placeholder="e.g. 1 Tablet after meal, 5ml syrup" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reminderTime">Scheduled Time <span class="req">*</span></label>
+              <input type="time" id="reminderTime" required>
+            </div>
+
+            <div class="form-group">
+              <label for="frequency">Frequency & Recurrence <span class="req">*</span></label>
+              <select id="frequency">
+                <option value="Daily">Daily (Once a day)</option>
+                <option value="Twice Daily">Twice Daily (Morning & Night)</option>
+                <option value="Weekly">Weekly (Once a week)</option>
+                <option value="Custom">Custom Days Schedule</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dynamic Second Time Slot (Twice Daily) -->
+          <div class="form-group" id="secondTimeGroup" style="display: none;">
+            <label for="secondTime">Second Dose Time (Evening/Night) <span class="req">*</span></label>
+            <input type="time" id="secondTime" value="20:00">
+          </div>
+
+          <!-- Dynamic Custom Days Selection (Custom) -->
+          <div class="form-group" id="customDaysGroup" style="display: none;">
+            <label>Recurrence Days <span class="req">*</span></label>
+            <div class="day-pills">
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Mon" checked><span>Mon</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Tue"><span>Tue</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Wed" checked><span>Wed</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Thu"><span>Thu</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Fri" checked><span>Fri</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Sat"><span>Sat</span></label>
+              <label class="day-pill"><input type="checkbox" class="custom-day" value="Sun"><span>Sun</span></label>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startDate">Course Start Date</label>
+              <input type="date" id="startDate">
+            </div>
+
+            <div class="form-group">
+              <label for="durationDays">Course Duration (Days)</label>
+              <input type="number" id="durationDays" min="1" max="365" value="7">
+            </div>
+          </div>
+
+          <!-- Notification Channels -->
+          <div class="form-group channels-group">
+            <label>Automated Notification Channels <span class="req">*</span></label>
+            <div class="checkbox-row">
+              <label class="checkbox-label">
+                <input type="checkbox" id="chPush" checked>
+                <span class="badge-chip badge-push">🔔 Browser Push</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="chSMS" checked>
+                <span class="badge-chip badge-sms">📱 SMS Alert</span>
+              </label>
+              <label class="checkbox-label">
+                <input type="checkbox" id="chEmail" checked>
+                <span class="badge-chip badge-email">✉️ Email Digest</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="form-row optional-contacts">
+            <div class="form-group">
+              <label for="phoneNumber">SMS Phone Number</label>
+              <input type="tel" id="phoneNumber" placeholder="+1 (555) 019-2834" value="+1 (555) 019-2834">
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" placeholder="patient@mediconnect.health" value="patient@mediconnect.health">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary">
+            <span>➕ Add Schedule & Enable Alerts</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Active Reminders List Card -->
+      <section class="card list-card">
+        <div class="card-header flex-between">
+          <div>
+            <h2>📋 Active Medicine Schedule & Course Progress</h2>
+            <p>Track daily dosages, monitor course progress, and view auto-expired schedules.</p>
+          </div>
+          <button id="refreshBtn" class="btn btn-secondary btn-sm">🔄 Refresh</button>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+          <button class="tab-btn active" data-filter="all">All (<span id="countAll">0</span>)</button>
+          <button class="tab-btn" data-filter="pending">Pending (<span id="countPending">0</span>)</button>
+          <button class="tab-btn" data-filter="taken">Taken (<span id="countTaken">0</span>)</button>
+          <button class="tab-btn" data-filter="snoozed">Snoozed (<span id="countSnoozed">0</span>)</button>
+          <button class="tab-btn" data-filter="expired">Expired (<span id="countExpired">0</span>)</button>
+        </div>
+
+        <!-- Reminders Container -->
+        <div id="remindersList" class="reminders-list">
+          <div class="empty-state">
+            <div class="empty-icon">💊</div>
+            <p>No medicine reminders added yet.</p>
+            <small>Use the form on the left to schedule your first reminder.</small>
+          </div>
+        </div>
+      </section>
+      </main>
+
+      <!-- Notification Logs Panel -->
+      <section class="card notification-card">
+        <div class="card-header flex-between">
+          <div>
+            <h2>🔔 Live Automated Notification History & Dispatch Log</h2>
+            <p>Real-time delivery log of background notifications sent via Browser Push, SMS, and Email.</p>
+          </div>
+          <div class="header-actions">
+            <button id="testNotifBtn" class="btn btn-accent btn-sm">🧪 Test Instant Notification</button>
+            <button id="refreshLogsBtn" class="btn btn-secondary btn-sm">🔄 Refresh Logs</button>
+          </div>
+        </div>
+
+        <div id="notificationLogsList" class="notification-logs-list">
+          <div class="empty-state">
+            <div class="empty-icon">🔕</div>
+            <p>No automated notifications dispatched yet.</p>
+            <small>Click "Test Instant Notification" or set a reminder for the current time.</small>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab 2: Symptom Checker -->
+    <div id="symptoms-tab" class="tab-content">
+      <!-- Symptom Checker & Disease Predictor Card -->
+      <section class="card symptom-card">
+        <div class="card-header flex-between">
+          <div>
+            <h2>🤖 AI-Assisted Symptom Checker & Disease Predictor</h2>
+            <p>Select your symptoms, adjust severity, and get immediate rule-based diagnostic analysis and treatment recommendations.</p>
+          </div>
+          <button id="clearSymptomHistoryBtn" class="btn btn-secondary btn-sm">🗑️ Clear History</button>
+        </div>
+
+        <div class="symptom-checker-grid">
+          <!-- Input section -->
+          <div class="symptom-input-col">
+            <div class="form-group">
+              <label>Select Symptoms <span class="req">*</span></label>
+              <div class="symptom-pills-container">
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Fever">
+                  <span>Fever 🌡️</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Cough">
+                  <span>Cough 😷</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Sore Throat">
+                  <span>Sore Throat 🤒</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Headache">
+                  <span>Headache 🤕</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Body Ache">
+                  <span>Body Ache 💪</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Runny Nose">
+                  <span>Runny Nose 👃</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Shortness of Breath">
+                  <span>Shortness of Breath 💨</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Fatigue">
+                  <span>Fatigue ⚡</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Nausea / Vomiting">
+                  <span>Nausea / Vomiting 🤢</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Loss of Smell / Taste">
+                  <span>Loss of Smell/Taste 👅</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Diarrhea">
+                  <span>Diarrhea 🚽</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Chest Pain">
+                  <span>Chest Pain 🫁</span>
+                </label>
+                <label class="symptom-pill-checkbox">
+                  <input type="checkbox" name="symptoms" value="Stiff Neck">
+                  <span>Stiff Neck 🧣</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row" style="margin-top: 15px;">
+              <div class="form-group">
+                <label for="symptomSeverity">Symptom Severity</label>
+                <div class="severity-slider-wrapper">
+                  <input type="range" id="symptomSeverity" min="1" max="3" value="2" step="1">
+                  <div class="severity-labels">
+                    <span>Mild</span>
+                    <span>Moderate</span>
+                    <span>Severe</span>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label for="symptomDuration">Duration (Days)</label>
+                <input type="number" id="symptomDuration" min="1" max="30" value="1">
+              </div>
+            </div>
+
+            <button type="button" id="analyzeSymptomsBtn" class="btn btn-primary" style="margin-top: 15px;">
+              <span>🔍 Analyze Symptoms & Predict</span>
+            </button>
+          </div>
+
+          <!-- Result section -->
+          <div class="symptom-result-col">
+            <div class="result-placeholder" id="symptomResultPlaceholder">
+              <div class="placeholder-icon">🩺</div>
+              <p>Ready for Analysis</p>
+              <small>Select your symptoms on the left and click "Analyze Symptoms & Predict" to see diagnosis, urgency level, recommendations, and suggested home remedies.</small>
+            </div>
+            <div class="result-content" id="symptomResultContent" style="display: none;">
+              <!-- Will be populated dynamically -->
+            </div>
+          </div>
+
+          <!-- History section -->
+          <div class="symptom-history-col">
+            <h3>📜 Recent Symptom Logs</h3>
+            <div id="symptomHistoryList" class="symptom-history-list">
+              <div class="empty-state">
+                <p>No recent symptom checks.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Tab 3: Diet & Fitness -->
+    <div id="diet-tab" class="tab-content">
+      <div class="stats-widgets-row">
+        <div class="stats-widget shadow-glow">
+          <div class="widget-icon">🍏</div>
+          <div class="widget-info">
+            <span class="widget-title">Daily Calorie Intake Goal</span>
+            <span class="widget-value"><span id="calorieIntake">0</span> / 2000 kcal</span>
+            <div class="progress-bar-container">
+              <div id="intakeProgress" class="progress-bar-fill intake" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-widget shadow-glow">
+          <div class="widget-icon">🔥</div>
+          <div class="widget-info">
+            <span class="widget-title">Daily Workout Calorie Burn</span>
+            <span class="widget-value"><span id="calorieBurnt">0</span> / 400 kcal</span>
+            <div class="progress-bar-container">
+              <div id="burnProgress" class="progress-bar-fill burn" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="stats-widget shadow-glow">
+          <div class="widget-icon">⚖️</div>
+          <div class="widget-info">
+            <span class="widget-title">Net Daily Calorie Balance</span>
+            <span class="widget-value"><span id="calorieBalance">0</span> kcal</span>
+            <div class="progress-bar-container">
+              <div id="balanceProgress" class="progress-bar-fill balance" style="width: 0%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="diet-fitness-grid">
+        <section class="card meal-card">
+          <div class="card-header flex-between">
+            <div>
+              <h2>🍳 Log Meal Intake</h2>
+              <p>Enter meal details and track daily calorie/macro distribution.</p>
+            </div>
+          </div>
+          <form id="mealForm" class="health-form">
+            <div class="form-group">
+              <label for="mealName">Meal Name <span class="req">*</span></label>
+              <input type="text" id="mealName" placeholder="e.g. Grilled Chicken Salad, Oatmeal" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="mealType">Meal Type</label>
+                <select id="mealType">
+                  <option value="Breakfast">Breakfast</option>
+                  <option value="Lunch">Lunch</option>
+                  <option value="Dinner">Dinner</option>
+                  <option value="Snack">Snack</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="mealCalories">Calories (kcal) <span class="req">*</span></label>
+                <input type="number" id="mealCalories" min="0" placeholder="e.g. 350" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="mealProtein">Protein (g)</label>
+                <input type="number" id="mealProtein" min="0" value="0">
+              </div>
+              <div class="form-group">
+                <label for="mealCarbs">Carbs (g)</label>
+                <input type="number" id="mealCarbs" min="0" value="0">
+              </div>
+              <div class="form-group">
+                <label for="mealFat">Fats (g)</label>
+                <input type="number" id="mealFat" min="0" value="0">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">🍳 Log Meal</button>
+          </form>
+          
+          <div class="logs-header flex-between" style="margin-top: 15px;">
+            <h3>🍳 Today's Meals</h3>
+            <button type="button" class="btn btn-secondary btn-sm" id="clearMealsBtn">Clear Meals</button>
+          </div>
+          <div id="mealsList" class="health-list">
+            <div class="empty-state">
+              <p>No meals logged today.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card workout-card">
+          <div class="card-header flex-between">
+            <div>
+              <h2>🏃 Log Workout Session</h2>
+              <p>Enter physical exercises and monitor active calorie burn.</p>
+            </div>
+          </div>
+          <form id="workoutForm" class="health-form">
+            <div class="form-group">
+              <label for="workoutName">Exercise Name <span class="req">*</span></label>
+              <input type="text" id="workoutName" placeholder="e.g. Jogging, Push-ups" required>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="workoutCategory">Category</label>
+                <select id="workoutCategory">
+                  <option value="Cardio">Cardio</option>
+                  <option value="Strength">Strength</option>
+                  <option value="Flexibility">Flexibility</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label for="workoutDuration">Duration (Mins)</label>
+                <input type="number" id="workoutDuration" min="0" placeholder="e.g. 30" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label for="workoutReps">Reps (If applicable)</label>
+                <input type="number" id="workoutReps" min="0" value="0">
+              </div>
+              <div class="form-group">
+                <label for="workoutCalories">Calories Burned <span class="req">*</span></label>
+                <input type="number" id="workoutCalories" min="0" placeholder="e.g. 250" required>
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">🏃 Log Workout</button>
+          </form>
+
+          <div class="logs-header flex-between" style="margin-top: 15px;">
+            <h3>🏃 Today's Workouts</h3>
+            <button type="button" class="btn btn-secondary btn-sm" id="clearWorkoutsBtn">Clear Workouts</button>
+          </div>
+          <div id="workoutsList" class="health-list">
+            <div class="empty-state">
+              <p>No workouts logged today.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="card recommendations-card">
+          <div class="card-header">
+            <h2>🥗 Health Recommendations</h2>
+            <p>Select your goal to see custom diet, nutrition, and workout advice.</p>
+          </div>
+          <div class="form-group">
+            <label for="healthGoal">Select Health Goal</label>
+            <select id="healthGoal">
+              <option value="weight-loss">Weight Loss & Fat Reduction</option>
+              <option value="muscle-gain">Muscle Gain & Body Building</option>
+              <option value="heart-health">Healthy Heart Plan</option>
+              <option value="diabetic-care">Diabetic Sugar Control</option>
+            </select>
+          </div>
+
+          <div id="goalRecommendations" class="recommendation-content">
+            <!-- Will be populated dynamically -->
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- Tab 4: Vitals Tracker -->
+    <div id="vitals-tab" class="tab-content">
+      <div id="bpCrisisBanner" class="bp-crisis-banner" style="display: none;">
+        <span class="crisis-icon">🚨</span>
+        <div class="crisis-info">
+          <strong>CRITICAL HYPERTENSIVE CRISIS ALERT</strong>
+          <p>Your logged Blood Pressure readings exceed critical medical limits (>180 Systolic and/or >120 Diastolic). Please contact emergency services or proceed to the nearest hospital ER immediately!</p>
+        </div>
+      </div>
+
+      <div class="vitals-grid">
+        <section class="card vital-input-card">
+          <div class="card-header">
+            <h2>📈 Log Blood Pressure Vitals</h2>
+            <p>Enter systolic pressure, diastolic pressure, and heart rate pulse.</p>
+          </div>
+          <form id="vitalsForm" class="health-form">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="bpSystolic">Systolic (mmHg) <span class="req">*</span></label>
+                <input type="number" id="bpSystolic" min="50" max="250" placeholder="e.g. 120" required>
+              </div>
+              <div class="form-group">
+                <label for="bpDiastolic">Diastolic (mmHg) <span class="req">*</span></label>
+                <input type="number" id="bpDiastolic" min="30" max="180" placeholder="e.g. 80" required>
+              </div>
+              <div class="form-group">
+                <label for="bpPulse">Pulse Rate (bpm)</label>
+                <input type="number" id="bpPulse" min="30" max="200" value="72">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top: 10px;">➕ Log BP Reading</button>
+          </form>
+          
+          <div class="clinical-ranges" style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 15px;">
+            <h4>Clinical Classification Guidelines:</h4>
+            <div class="bp-guide-row"><span class="bp-badge normal">Normal</span><span>&lt; 120 systolic AND &lt; 80 diastolic</span></div>
+            <div class="bp-guide-row"><span class="bp-badge elevated">Elevated</span><span>120-129 systolic AND &lt; 80 diastolic</span></div>
+            <div class="bp-guide-row"><span class="bp-badge stage1">Stage 1</span><span>130-139 systolic OR 80-89 diastolic</span></div>
+            <div class="bp-guide-row"><span class="bp-badge stage2">Stage 2</span><span>&ge; 140 systolic OR &ge; 90 diastolic</span></div>
+            <div class="bp-guide-row"><span class="bp-badge crisis">Crisis</span><span>&gt; 180 systolic AND/OR &gt; 120 diastolic</span></div>
+          </div>
+        </section>
+
+        <section class="card vitals-history-card">
+          <div class="card-header flex-between">
+            <div>
+              <h2>📋 Blood Pressure History Log</h2>
+              <p>Review recent blood pressure logs, category levels, and alerts.</p>
+            </div>
+            <button type="button" class="btn btn-secondary btn-sm" id="clearVitalsBtn">Clear Log</button>
+          </div>
+          <div id="vitalsHistoryList" class="vitals-list">
+            <div class="empty-state">
+              <p>No BP readings logged yet.</p>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section class="card bp-chart-card" style="margin-top: 24px;">
+        <div class="card-header">
+          <h2>📊 Cardiovascular Vitals Trend Chart</h2>
+          <p>Timeline plotting your Systolic and Diastolic pressure readings (mmHg) over time.</p>
+        </div>
+        <div class="chart-container" id="bpChartContainer">
+          <!-- Dynamically generated SVG Chart goes here -->
+        </div>
+      </section>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>MediConnect Healthcare Support Platform &bull; SRS Version 1.0 Feature #16: Recurring & Auto-Expiring Medicine Schedules</p>
+    </footer>
+  </div>
+
+  <!-- Toast Container -->
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

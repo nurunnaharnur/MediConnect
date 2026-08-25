@@ -1,5 +1,6 @@
 import MedicineReminder from '../models/MedicineReminder.js';
-import { sendEmailNotification } from '../services/notificationService.js';
+import { ReminderModel } from '../models/reminderModel.js';
+import { sendEmailNotification, NotificationService } from '../services/notificationService.js';
 import jwt from 'jsonwebtoken';
 
 // Helper to render responsive HTML confirmation page for email actions
@@ -211,18 +212,32 @@ export const handleEmailAction = async (req, res) => {
 // @desc    Create medicine reminder
 // @route   POST /api/reminders
 export const createReminder = async (req, res) => {
-  const { name, dosage, time, mealSegment, notes, emailNotification, frequency, endDate } = req.body;
+  const { name, medicineName, dosage, time, secondTime, mealSegment, notes, emailNotification, frequency, customDays, startDate, durationDays, endDate, channels, phoneNumber, email } = req.body;
   try {
+    const finalName = (name || medicineName || '').trim();
+    if (!finalName) {
+      return res.status(400).json({ error: 'Medicine name is required.' });
+    }
+
+    const patientId = req.user ? req.user._id : null;
+
     const reminder = await MedicineReminder.create({
-      patientId: req.user._id,
-      name,
-      dosage,
-      time,
+      patientId: patientId,
+      name: finalName,
+      dosage: (dosage || 'Prescribed dose').trim(),
+      time: (time || '09:00').trim(),
+      secondTime: secondTime || '',
       mealSegment: mealSegment || 'other',
       notes: notes || '',
       emailNotification: emailNotification ?? true,
       frequency: frequency || 'daily',
-      endDate
+      customDays: Array.isArray(customDays) ? customDays : [],
+      startDate: startDate ? new Date(startDate) : new Date(),
+      durationDays: durationDays || 7,
+      endDate: endDate || undefined,
+      channels: Array.isArray(channels) && channels.length > 0 ? channels : ['push'],
+      phoneNumber: phoneNumber || '',
+      email: email || (req.user ? req.user.email : '')
     });
     res.status(201).json(reminder);
   } catch (error) {
@@ -234,10 +249,29 @@ export const createReminder = async (req, res) => {
 // @route   GET /api/reminders
 export const getReminders = async (req, res) => {
   try {
-    const reminders = await MedicineReminder.find({ patientId: req.user._id }).sort({ time: 1 });
+    const query = req.user ? { patientId: req.user._id } : {};
+    const reminders = await MedicineReminder.find(query).sort({ time: 1 });
     res.json(reminders);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const getAllReminders = async (req, res) => {
+  return getReminders(req, res);
+};
+
+export const getReminderById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const reminder = await MedicineReminder.findById(id);
+    if (!reminder) {
+      return res.status(404).json({ error: 'Medicine reminder not found.' });
+    }
+    return res.status(200).json({ reminder });
+  } catch (error) {
+    console.error('Error fetching reminder:', error);
+    return res.status(500).json({ error: 'Failed to fetch medicine reminder.' });
   }
 };
 
@@ -246,7 +280,8 @@ export const getReminders = async (req, res) => {
 export const updateReminderStatus = async (req, res) => {
   const { status } = req.body; 
   try {
-    const reminder = await MedicineReminder.findOne({ _id: req.params.id, patientId: req.user._id });
+    const query = req.user ? { _id: req.params.id, patientId: req.user._id } : { _id: req.params.id };
+    const reminder = await MedicineReminder.findOne(query);
     if (!reminder) return res.status(404).json({ message: 'Reminder record not found' });
 
     reminder.status = status;
@@ -256,6 +291,21 @@ export const updateReminderStatus = async (req, res) => {
     res.json({ message: `Reminder status updated to ${status}`, reminder });
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const deleteReminder = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const query = req.user ? { _id: id, patientId: req.user._id } : { _id: id };
+    const deleted = await MedicineReminder.findOneAndDelete(query);
+    if (!deleted) {
+      return res.status(404).json({ error: 'Medicine reminder not found.' });
+    }
+    return res.status(200).json({ message: 'Medicine reminder deleted successfully.' });
+  } catch (error) {
+    console.error('Error deleting reminder:', error);
+    return res.status(500).json({ error: 'Failed to delete medicine reminder.' });
   }
 };
 
@@ -276,3 +326,65 @@ export const sendTestReminderEmail = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+// Notification Log Helpers
+export async function getNotificationLogs(req, res) {
+  try {
+    const logs = await NotificationService.getLogs();
+    return res.status(200).json({ count: logs.length, logs });
+  } catch (error) {
+    console.error('Error fetching notification logs:', error);
+    return res.status(500).json({ error: 'Failed to fetch notification logs.' });
+  }
+}
+
+export async function triggerTestNotification(req, res) {
+  try {
+    const { reminderId, channel } = req.body;
+    let reminder = null;
+
+    if (reminderId) {
+      reminder = await MedicineReminder.findById(reminderId) || await ReminderModel.getById(reminderId);
+    }
+
+    if (!reminder) {
+      reminder = {
+        id: 'test_sample',
+        medicineName: 'Paracetamol 500mg',
+        dosage: '1 Tablet after meal',
+        phoneNumber: req.body.phoneNumber || '+1 (555) 019-2834',
+        email: req.body.email || (req.user ? req.user.email : 'patient@mediconnect.health')
+      };
+    }
+
+    const channelsToTrigger = channel ? [channel] : (reminder.channels || ['push', 'sms', 'email']);
+    const results = [];
+    for (const ch of channelsToTrigger) {
+      const resVal = await NotificationService.dispatchNotification(reminder, ch, true);
+      results.push(resVal);
+    }
+
+    return res.status(200).json({
+      message: 'Test notification triggered successfully!',
+      triggered: results
+    });
+  } catch (error) {
+    console.error('Error triggering test notification:', error);
+    return res.status(500).json({ error: 'Failed to trigger test notification.' });
+  }
+}
+
+export async function checkDueNotifications(req, res) {
+  try {
+    const newlyTriggered = await NotificationService.checkDueReminders();
+    const logs = await NotificationService.getLogs(20);
+    return res.status(200).json({
+      newCount: newlyTriggered.length,
+      newlyTriggered,
+      recentLogs: logs
+    });
+  } catch (error) {
+    console.error('Error checking due notifications:', error);
+    return res.status(500).json({ error: 'Failed to check due notifications.' });
+  }
+}

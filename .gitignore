@@ -10,6 +10,9 @@ server/.env
 # Build output
 dist/
 
+# Uploads and reports
+server/uploads/
+
 # Logs
 npm-debug.log*
 yarn-debug.log*

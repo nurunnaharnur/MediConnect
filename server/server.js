@@ -16,6 +16,8 @@ import menstrualCycleRoutes from './routes/menstrualCycleRoutes.js';
 import pcosRoutes from './routes/pcosRoutes.js';
 import sharedReportRoutes from './routes/sharedReportRoutes.js';
 import diagnosisRoutes from './routes/diagnosisRoutes.js';
+import healthRoutes from './routes/healthRoutes.js';
+import symptomRoutes from './routes/symptomRoutes.js';
 import { initReminderScheduler } from './services/notificationService.js';
 
 const app = express();
@@ -37,6 +39,8 @@ app.use('/api/symptoms', symptomLogRoutes);
 app.use('/api/pcos', pcosRoutes);
 app.use('/api/shared-reports', sharedReportRoutes);
 app.use('/api/diagnoses', diagnosisRoutes);
+app.use('/api/health', healthRoutes);
+app.use('/api/symptom-checker', symptomRoutes);
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
