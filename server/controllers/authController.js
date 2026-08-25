@@ -9,6 +9,7 @@ import jwt from 'jsonwebtoken';
 import { generatePersonalizedTips } from '../services/tipsService.js';
 import { sendEmergencyAlertEmail } from '../services/notificationService.js';
 import { streamComprehensiveHealthProfilePDF } from '../utils/pdfGenerator.js';
+import { syncDoctorUser } from '../services/doctorSyncService.js';
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET || 'mediconnect-secret', { expiresIn: '30d' });
@@ -48,6 +49,8 @@ export const register = async (req, res) => {
     specialization,
     qualification,
     licenseNumber,
+    experienceYears,
+    hospitalId,
     emergencyContact
   } = req.body;
 
@@ -72,6 +75,8 @@ export const register = async (req, res) => {
       userData.specialization = specialization;
       userData.qualification = qualification || '';
       userData.licenseNumber = licenseNumber || '';
+      userData.experienceYears = experienceYears ? parseInt(experienceYears, 10) : 5;
+      if (hospitalId) userData.hospitalId = hospitalId;
     } else {
       userData.age = age || 0;
       userData.gender = gender || 'Other';
@@ -82,6 +87,11 @@ export const register = async (req, res) => {
     }
 
     const user = await User.create(userData);
+
+    if (finalRole === 'doctor') {
+      await syncDoctorUser(user);
+    }
+
     res.status(201).json(formatUserResponse(user));
   } catch (error) {
     console.error('Registration error:', error);
@@ -92,7 +102,7 @@ export const register = async (req, res) => {
 // @desc    Register Doctor
 // @route   POST /api/auth/doctor-register
 export const doctorRegister = async (req, res) => {
-  const { name, email, password, specialization, qualification, licenseNumber } = req.body;
+  const { name, email, password, specialization, qualification, licenseNumber, experienceYears, hospitalId } = req.body;
 
   try {
     if (!name || !email || !password || !specialization) {
@@ -102,15 +112,20 @@ export const doctorRegister = async (req, res) => {
     const userExists = await User.findOne({ email });
     if (userExists) return res.status(400).json({ message: 'Email is already registered.' });
 
-    const doctor = await User.create({
+    const doctorData = {
       name,
       email,
       password,
       role: 'doctor',
       specialization,
       qualification: qualification || '',
-      licenseNumber: licenseNumber || ''
-    });
+      licenseNumber: licenseNumber || '',
+      experienceYears: experienceYears ? parseInt(experienceYears, 10) : 5
+    };
+    if (hospitalId) doctorData.hospitalId = hospitalId;
+
+    const doctor = await User.create(doctorData);
+    await syncDoctorUser(doctor);
 
     res.status(201).json(formatUserResponse(doctor));
   } catch (error) {

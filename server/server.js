@@ -21,6 +21,7 @@ import symptomRoutes from './routes/symptomRoutes.js';
 import symptomCheckRoutes from './routes/symptomCheckRoutes.js';
 import hospitalRoutes from './routes/hospitalRoutes.js';
 import { initReminderScheduler } from './services/notificationService.js';
+import { syncAllDoctorUsers } from './services/doctorSyncService.js';
 
 const app = express();
 app.use(express.json());
@@ -49,9 +50,10 @@ app.use('/api/symptom-check', symptomCheckRoutes);
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
     const PORT = process.env.PORT || 5001;
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
       console.log(`MediConnect ES-Module Server running on port ${PORT}`);
       initReminderScheduler(); // Cron scheduler for medicine reminders
+      await syncAllDoctorUsers(); // Sync registered doctors with hospital discovery
     });
   })
   .catch(err => console.error("Database connection failed:", err));

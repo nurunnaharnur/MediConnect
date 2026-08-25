@@ -166,6 +166,18 @@ export default function DoctorDashboard() {
               </span>
               <span className="doc-stat-label">Pending Appointments</span>
             </div>
+            <div
+              className="doc-stat-card"
+              style={{ cursor: 'pointer', background: '#E4EFEC', borderColor: '#146356' }}
+              onClick={() => navigate('/doctor/reports')}
+              role="button"
+              tabIndex={0}
+            >
+              <span className="doc-stat-val" style={{ color: '#146356' }}>📋 View</span>
+              <span className="doc-stat-label" style={{ color: '#0F4E44', fontWeight: 600 }}>
+                Shared Health Reports →
+              </span>
+            </div>
           </div>
         </section>
 

@@ -5,6 +5,7 @@ import MedicineReminder from '../models/MedicineReminder.js';
 import MoodEntry from '../models/MoodEntry.js';
 import WellbeingCheckin from '../models/WellbeingCheckin.js';
 import Appointment from '../models/Appointment.js';
+import { syncAllDoctorUsers, syncDoctorUser } from '../services/doctorSyncService.js';
 
 // @desc    Get List of Patients for Doctor Review
 // @route   GET /api/doctor/patients
@@ -16,32 +17,27 @@ export const getDoctorPatients = async (req, res) => {
 
     const patientSummaries = await Promise.all(
       patients.map(async (patient) => {
-        // Calculate BMI
         let bmi = null;
         if (patient.height && patient.weight && patient.height > 0) {
           const hm = patient.height / 100;
           bmi = Number((patient.weight / (hm * hm)).toFixed(1));
         }
 
-        // Active Prescriptions count
         const activeMeds = await MedicineReminder.find({
           patientId: patient._id,
-          status: 'scheduled'
+          status: 'scheduled',
         });
 
-        // Latest Mood Entry
         const latestMood = await MoodEntry.findOne({ patientId: patient._id })
           .sort({ entryDate: -1 });
 
-        // Latest Mental Well-being Screening
         const latestCheckin = await WellbeingCheckin.findOne({ patientId: patient._id })
           .sort({ completedAt: -1 });
 
-        // Upcoming Appointments
         const nextAppointment = await Appointment.findOne({
           patientId: patient._id,
           status: { $in: ['scheduled', 'Booked', 'Rescheduled'] },
-          date: { $gte: new Date() }
+          date: { $gte: new Date() },
         }).sort({ date: 1 });
 
         return {
@@ -56,25 +52,31 @@ export const getDoctorPatients = async (req, res) => {
           medicalHistory: patient.medicalHistory,
           emergencyContact: patient.emergencyContact,
           activePrescriptionsCount: activeMeds.length,
-          latestMood: latestMood ? {
-            mood: latestMood.mood,
-            score: latestMood.moodScore,
-            date: latestMood.entryDate,
-            emotions: latestMood.emotions
-          } : null,
-          latestScreening: latestCheckin ? {
-            type: latestCheckin.screeningType,
-            score: latestCheckin.totalScore,
-            maxScore: latestCheckin.maxScore,
-            indication: latestCheckin.indicationLevel,
-            date: latestCheckin.completedAt
-          } : null,
-          nextAppointment: nextAppointment ? {
-            _id: nextAppointment._id,
-            date: nextAppointment.date,
-            time: nextAppointment.time,
-            reason: nextAppointment.reason
-          } : null
+          latestMood: latestMood
+            ? {
+                mood: latestMood.mood,
+                score: latestMood.moodScore,
+                date: latestMood.entryDate,
+                emotions: latestMood.emotions,
+              }
+            : null,
+          latestScreening: latestCheckin
+            ? {
+                type: latestCheckin.screeningType,
+                score: latestCheckin.totalScore,
+                maxScore: latestCheckin.maxScore,
+                indication: latestCheckin.indicationLevel,
+                date: latestCheckin.completedAt,
+              }
+            : null,
+          nextAppointment: nextAppointment
+            ? {
+                _id: nextAppointment._id,
+                date: nextAppointment.date,
+                time: nextAppointment.time,
+                reason: nextAppointment.reason,
+              }
+            : null,
         };
       })
     );
@@ -95,24 +97,11 @@ export const getPatientFullRecord = async (req, res) => {
       return res.status(404).json({ message: 'Patient record not found.' });
     }
 
-    // 1. Prescriptions
-    const prescriptions = await MedicineReminder.find({ patientId: patient._id })
-      .sort({ createdAt: -1 });
+    const prescriptions = await MedicineReminder.find({ patientId: patient._id }).sort({ createdAt: -1 });
+    const moodEntries = await MoodEntry.find({ patientId: patient._id }).sort({ entryDate: -1 }).limit(30);
+    const screenings = await WellbeingCheckin.find({ patientId: patient._id }).sort({ completedAt: -1 });
+    const appointments = await Appointment.find({ patientId: patient._id }).sort({ date: -1 });
 
-    // 2. Mood Entries & Trend History
-    const moodEntries = await MoodEntry.find({ patientId: patient._id })
-      .sort({ entryDate: -1 })
-      .limit(30);
-
-    // 3. Mental Well-being Screenings History
-    const screenings = await WellbeingCheckin.find({ patientId: patient._id })
-      .sort({ completedAt: -1 });
-
-    // 4. Appointments History
-    const appointments = await Appointment.find({ patientId: patient._id })
-      .sort({ date: -1 });
-
-    // Calculate BMI
     let bmi = null;
     if (patient.height && patient.weight && patient.height > 0) {
       const hm = patient.height / 100;
@@ -131,12 +120,12 @@ export const getPatientFullRecord = async (req, res) => {
         bmi,
         medicalHistory: patient.medicalHistory,
         emergencyContact: patient.emergencyContact,
-        createdAt: patient.createdAt
+        createdAt: patient.createdAt,
       },
       prescriptions,
       moodEntries,
       screenings,
-      appointments
+      appointments,
     });
   } catch (error) {
     console.error('Error fetching patient full record:', error);
@@ -151,8 +140,8 @@ export const getDoctorAppointments = async (req, res) => {
     const appointments = await Appointment.find({
       $or: [
         { doctorId: req.user._id },
-        { doctorName: { $regex: new RegExp(req.user.name, 'i') } }
-      ]
+        { doctorName: { $regex: new RegExp(req.user.name, 'i') } },
+      ],
     }).sort({ date: 1 });
 
     res.json(appointments);
@@ -185,14 +174,39 @@ export const updateDoctorAppointment = async (req, res) => {
 };
 
 // @desc    List all doctors patients can share reports with / book with
-// @route   GET /api/doctor (or /api/doctors)
+// @route   GET /api/doctor (or /api/doctors/list-all)
 export const listDoctors = async (req, res) => {
   try {
-    const doctors = await User.find({ role: 'doctor' }).select(
-      'name email specialization qualification licenseNumber'
-    );
-    res.json(doctors);
+    // Ensure all registered doctor accounts have active synced doctor documents
+    await syncAllDoctorUsers();
+
+    const doctors = await Doctor.find()
+      .populate('hospitalId', 'name address phone')
+      .populate('userId', 'name email specialization qualification licenseNumber')
+      .sort({ rating: -1 });
+
+    // Format uniform response with consistent fields
+    const formatted = doctors.map((doc) => ({
+      _id: doc.userId?._id || doc._id,
+      doctorId: doc._id,
+      userId: doc.userId?._id || null,
+      name: doc.name,
+      email: doc.email || doc.userId?.email || '',
+      specialty: doc.specialty,
+      specialization: doc.specialty || doc.userId?.specialization || 'General Physician',
+      qualification: doc.userId?.qualification || '',
+      licenseNumber: doc.userId?.licenseNumber || '',
+      experienceYears: doc.experienceYears,
+      rating: doc.rating,
+      bio: doc.bio,
+      hospitalId: doc.hospitalId?._id || null,
+      hospitalName: doc.hospitalId?.name || 'General Practice Clinic',
+      availableSlots: doc.availableSlots,
+    }));
+
+    res.json(formatted);
   } catch (error) {
+    console.error('Error listing doctors:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -202,22 +216,49 @@ export const listDoctors = async (req, res) => {
 export const getDoctors = async (req, res) => {
   const { hospitalId, specialty, minRating } = req.query;
 
-  const query = {};
-  if (hospitalId) {
-    if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
-      return res.status(400).json({ message: 'Invalid hospitalId.' });
-    }
-    query.hospitalId = hospitalId;
-  }
-  if (specialty) query.specialty = specialty;
-  if (minRating) query.rating = { $gte: parseFloat(minRating) };
-
   try {
+    // Sync any newly registered doctors
+    await syncAllDoctorUsers();
+
+    const query = {};
+    if (hospitalId) {
+      if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
+        return res.status(400).json({ message: 'Invalid hospitalId.' });
+      }
+      query.hospitalId = hospitalId;
+    }
+
+    if (specialty && specialty.trim()) {
+      // Use case-insensitive regex partial matching for specialty flexibility
+      query.specialty = { $regex: new RegExp(specialty.trim(), 'i') };
+    }
+
+    if (minRating) {
+      query.rating = { $gte: parseFloat(minRating) };
+    }
+
     const doctors = await Doctor.find(query)
-      .populate('hospitalId', 'name address')
+      .populate('hospitalId', 'name address phone')
+      .populate('userId', 'name email specialization qualification licenseNumber')
       .sort({ rating: -1 });
-    res.json(doctors);
+
+    const formatted = doctors.map((doc) => ({
+      _id: doc._id,
+      userId: doc.userId?._id || doc._id,
+      name: doc.name,
+      email: doc.email || doc.userId?.email || '',
+      specialty: doc.specialty,
+      specialization: doc.specialty,
+      experienceYears: doc.experienceYears,
+      rating: doc.rating,
+      bio: doc.bio,
+      hospitalId: doc.hospitalId,
+      availableSlots: doc.availableSlots,
+    }));
+
+    res.json(formatted);
   } catch (error) {
+    console.error('Error fetching doctors:', error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -225,15 +266,43 @@ export const getDoctors = async (req, res) => {
 // @desc    Get a single doctor's full profile & weekly available time slots (FR-11)
 // @route   GET /api/doctors/:id
 export const getDoctorById = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: 'Invalid doctor id.' });
     }
-    const doctor = await Doctor.findById(req.params.id).populate('hospitalId', 'name address phone');
-    if (!doctor) return res.status(404).json({ message: 'Doctor not found.' });
+
+    // Try finding by Doctor._id first
+    let doctor = await Doctor.findById(id)
+      .populate('hospitalId', 'name address phone')
+      .populate('userId', 'name email specialization qualification licenseNumber');
+
+    // If not found, try finding by userId
+    if (!doctor) {
+      doctor = await Doctor.findOne({ userId: id })
+        .populate('hospitalId', 'name address phone')
+        .populate('userId', 'name email specialization qualification licenseNumber');
+    }
+
+    // If still not found, check if it's a User with role: 'doctor' and sync it
+    if (!doctor) {
+      const user = await User.findOne({ _id: id, role: 'doctor' });
+      if (user) {
+        const synced = await syncDoctorUser(user);
+        if (synced) {
+          doctor = await Doctor.findById(synced._id)
+            .populate('hospitalId', 'name address phone')
+            .populate('userId', 'name email specialization qualification licenseNumber');
+        }
+      }
+    }
+
+    if (!doctor) return res.status(404).json({ message: 'Doctor profile not found.' });
+
     res.json(doctor);
   } catch (error) {
+    console.error('Error fetching doctor by id:', error);
     res.status(500).json({ message: error.message });
   }
 };
-

@@ -15,11 +15,13 @@ const SlotSchema = new mongoose.Schema(
 
 const DoctorSchema = new mongoose.Schema(
   {
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     name: { type: String, required: true },
+    email: { type: String, default: '' },
     specialty: { type: String, required: true },
-    experienceYears: { type: Number, required: true, min: 0 },
-    hospitalId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hospital', required: true },
-    rating: { type: Number, min: 0, max: 5, default: 0 },
+    experienceYears: { type: Number, required: true, min: 0, default: 5 },
+    hospitalId: { type: mongoose.Schema.Types.ObjectId, ref: 'Hospital', default: null },
+    rating: { type: Number, min: 0, max: 5, default: 4.8 },
     bio: { type: String, default: '' },
     availableSlots: { type: [SlotSchema], default: [] },
   },
@@ -27,5 +29,6 @@ const DoctorSchema = new mongoose.Schema(
 );
 
 DoctorSchema.index({ hospitalId: 1, specialty: 1 });
+DoctorSchema.index({ userId: 1 });
 
 export default mongoose.model('Doctor', DoctorSchema);

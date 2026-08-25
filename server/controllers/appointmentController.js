@@ -1,6 +1,8 @@
 import mongoose from 'mongoose';
 import Appointment from '../models/Appointment.js';
 import User from '../models/User.js';
+import Doctor from '../models/Doctor.js';
+import { syncAllDoctorUsers } from '../services/doctorSyncService.js';
 
 function isValidId(id) {
   return mongoose.Types.ObjectId.isValid(id);
@@ -22,14 +24,22 @@ export const bookAppointment = async (req, res) => {
 
   try {
     let assignedDoctorId = doctorId && isValidId(doctorId) ? doctorId : null;
-    let assignedDoctorName = doctorName || 'Dr. Sarah Jenkins, MD';
+    let assignedDoctorName = doctorName || 'Attending Physician';
     let assignedSpecialty = doctorSpecialty || department || 'General Practice';
 
     if (doctorId && isValidId(doctorId)) {
-      const doc = await User.findOne({ _id: doctorId, role: 'doctor' });
-      if (doc) {
-        assignedDoctorName = doc.name;
-        assignedSpecialty = doc.specialization || assignedSpecialty;
+      const docUser = await User.findOne({ _id: doctorId, role: 'doctor' });
+      if (docUser) {
+        assignedDoctorName = docUser.name;
+        assignedSpecialty = docUser.specialization || assignedSpecialty;
+        assignedDoctorId = docUser._id;
+      } else {
+        const docRecord = await Doctor.findById(doctorId).populate('userId');
+        if (docRecord) {
+          assignedDoctorName = docRecord.name;
+          assignedSpecialty = docRecord.specialty || assignedSpecialty;
+          assignedDoctorId = docRecord.userId?._id || docRecord._id;
+        }
       }
     }
 
@@ -44,7 +54,7 @@ export const bookAppointment = async (req, res) => {
       time,
       reason: reason || '',
       type: type || 'consultation',
-      status: 'scheduled'
+      status: 'scheduled',
     });
 
     res.status(201).json(appointment);
@@ -108,7 +118,7 @@ export const rescheduleAppointment = async (req, res) => {
 };
 
 // @desc    Cancel an appointment
-// @route   PATCH /api/appointments/:id/cancel or PUT /api/appointments/:id/cancel
+// @route   PATCH /api/appointments/:id/cancel
 export const cancelAppointment = async (req, res) => {
   const { id } = req.params;
 
@@ -141,9 +151,26 @@ export const cancelAppointment = async (req, res) => {
 // @route   GET /api/appointments/doctors
 export const getAvailableDoctors = async (req, res) => {
   try {
-    const doctors = await User.find({ role: 'doctor' })
-      .select('_id name email specialization qualification licenseNumber');
-    res.json(doctors);
+    await syncAllDoctorUsers();
+
+    const doctors = await Doctor.find()
+      .populate('hospitalId', 'name address')
+      .populate('userId', 'name email specialization qualification licenseNumber')
+      .sort({ rating: -1 });
+
+    const formatted = doctors.map((doc) => ({
+      _id: doc.userId?._id || doc._id,
+      name: doc.name,
+      email: doc.email || doc.userId?.email || '',
+      specialization: doc.specialty || doc.userId?.specialization || 'General Practice',
+      qualification: doc.userId?.qualification || '',
+      licenseNumber: doc.userId?.licenseNumber || '',
+      rating: doc.rating,
+      hospitalName: doc.hospitalId?.name || 'General Practice Clinic',
+      availableSlots: doc.availableSlots,
+    }));
+
+    res.json(formatted);
   } catch (error) {
     console.error('Error fetching doctors list:', error);
     res.status(500).json({ message: error.message || 'Failed to fetch doctors list.' });
