@@ -18,6 +18,9 @@ import ShareReport from './pages/ShareReport';
 import MyDiagnoses from './pages/MyDiagnoses';
 import DoctorSharedReports from './pages/DoctorSharedReports';
 import DoctorReportDetail from './pages/DoctorReportDetail';
+import SymptomChecker from './pages/SymptomChecker';
+import DietFitness from './pages/DietFitness';
+import BloodPressure from './pages/BloodPressure';
 import Layout from './components/Layout';
 import { getToken, getUser } from './api/authApi';
 
@@ -88,6 +91,9 @@ function App() {
           <Route path="/pcos" element={<PcosCheck />} />
           <Route path="/cycles" element={<CycleTracker />} />
           <Route path="/cycles/prediction" element={<CyclePrediction />} />
+          <Route path="/symptom-checker" element={<SymptomChecker />} />
+          <Route path="/diet-fitness" element={<DietFitness />} />
+          <Route path="/blood-pressure" element={<BloodPressure />} />
           <Route path="/reports/generate" element={<GenerateReport />} />
           <Route path="/reports/history" element={<ReportHistory />} />
           <Route path="/symptoms" element={<SymptomHistory />} />

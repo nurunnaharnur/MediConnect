@@ -668,6 +668,66 @@ export default function Dashboard() {
             </div>
           </div>
 
+          {/* Card 7: AI Symptom Checker & Disease Predictor */}
+          <div
+            className="dash-card"
+            onClick={() => navigate('/symptom-checker')}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="dash-card-header">
+              <div className="dash-icon-box" style={{ background: '#EEF2FF', color: '#4F46E5' }}>🩺</div>
+              <span className="dash-chip" style={{ background: '#EEF2FF', color: '#4F46E5' }}>AI Clinical Engine</span>
+            </div>
+            <h3>AI Symptom & Disease Checker</h3>
+            <p>
+              Rule-based evaluation across 13 symptom combinations, match confidence scoring, urgency badges, and quick dose scheduling.
+            </p>
+            <div className="dash-card-footer">
+              <span className="dash-card-cta" style={{ color: '#4F46E5' }}>Run Symptom Check →</span>
+            </div>
+          </div>
+
+          {/* Card 8: Diet & Nutrition / Fitness Tracker */}
+          <div
+            className="dash-card"
+            onClick={() => navigate('/diet-fitness')}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="dash-card-header">
+              <div className="dash-icon-box" style={{ background: '#FEF3C7', color: '#D97706' }}>🥗</div>
+              <span className="dash-chip" style={{ background: '#FEF3C7', color: '#D97706' }}>Nutrition & Burn</span>
+            </div>
+            <h3>Diet & Fitness Tracker</h3>
+            <p>
+              Log meal calories and macros (P/C/F), record workout reps and active calorie burn, and view personalized target plans.
+            </p>
+            <div className="dash-card-footer">
+              <span className="dash-card-cta" style={{ color: '#D97706' }}>Open Diet & Fitness Hub →</span>
+            </div>
+          </div>
+
+          {/* Card 9: Blood Pressure Vitals & Trends */}
+          <div
+            className="dash-card"
+            onClick={() => navigate('/blood-pressure')}
+            role="button"
+            tabIndex={0}
+          >
+            <div className="dash-card-header">
+              <div className="dash-icon-box" style={{ background: '#FEE2E2', color: '#DC2626' }}>🫀</div>
+              <span className="dash-chip" style={{ background: '#FEE2E2', color: '#DC2626' }}>Cardiovascular Vitals</span>
+            </div>
+            <h3>Blood Pressure & Vitals Trend</h3>
+            <p>
+              Log systolic and diastolic readings, track dynamic SVG trend trajectory charts, and detect hypertensive risk categories.
+            </p>
+            <div className="dash-card-footer">
+              <span className="dash-card-cta" style={{ color: '#DC2626' }}>Track Blood Pressure →</span>
+            </div>
+          </div>
+
           {/* Card 7: AI Health Assistant */}
           <div
             className="dash-card"

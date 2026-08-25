@@ -4,6 +4,9 @@ import '../styles/NavBar.css';
 
 const PATIENT_LINKS = [
   { to: '/dashboard', label: '📊 Dashboard' },
+  { to: '/symptom-checker', label: '🩺 Symptom Checker' },
+  { to: '/diet-fitness', label: '🥗 Diet & Fitness' },
+  { to: '/blood-pressure', label: '🫀 Blood Pressure' },
   { to: '/reminders', label: '💊 Reminders' },
   { to: '/mental-wellbeing', label: '🧠 Mental Health' },
   { to: '/appointments', label: '📅 Appointments' },
@@ -12,7 +15,6 @@ const PATIENT_LINKS = [
   { to: '/cycles/prediction', label: '🔮 Predictions' },
   { to: '/reports/generate', label: '📄 Health Report' },
   { to: '/reports/history', label: '📜 Report History' },
-  { to: '/symptoms', label: '🩺 Symptoms' },
   { to: '/reports/share', label: '🤝 Share Report' },
   { to: '/diagnoses', label: '📋 Diagnoses' },
 ];
