@@ -21,30 +21,27 @@ async function request(path, options = {}) {
   return data;
 }
 
-// GET /api/reminders
-export function fetchReminders() {
-  return request('/reminders');
-}
-
-// POST /api/reminders
-export function createReminder(reminderData) {
-  return request('/reminders', {
+// POST /api/mood
+export function createMoodEntry(payload) {
+  return request('/mood', {
     method: 'POST',
-    body: JSON.stringify(reminderData),
+    body: JSON.stringify(payload),
   });
 }
 
-// PATCH /api/reminders/:id/status
-export function updateReminderStatus(id, status) {
-  return request(`/reminders/${id}/status`, {
-    method: 'PATCH',
-    body: JSON.stringify({ status }),
-  });
+// GET /api/mood?timeframe=7d|30d|90d|all
+export function fetchMoodEntries(timeframe = '7d') {
+  return request(`/mood?timeframe=${timeframe}`);
 }
 
-// POST /api/reminders/:id/test-email
-export function testReminderEmail(id) {
-  return request(`/reminders/${id}/test-email`, {
-    method: 'POST',
+// GET /api/mood/analytics?timeframe=7d|30d|90d
+export function fetchMoodAnalytics(timeframe = '7d') {
+  return request(`/mood/analytics?timeframe=${timeframe}`);
+}
+
+// DELETE /api/mood/:id
+export function deleteMoodEntry(id) {
+  return request(`/mood/${id}`, {
+    method: 'DELETE',
   });
 }

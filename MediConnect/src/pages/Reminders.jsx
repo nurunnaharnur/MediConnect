@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   fetchReminders,
   createReminder,
   updateReminderStatus,
+  testReminderEmail,
 } from '../api/reminderApi';
+import { getUser, clearSession } from '../api/authApi';
 import '../styles/Reminders.css';
 
 const STATUS_LABELS = {
@@ -12,10 +15,24 @@ const STATUS_LABELS = {
   snoozed: 'Snoozed',
 };
 
+const MEAL_OPTIONS = [
+  { value: 'other', label: 'None / No specific meal' },
+  { value: 'before_breakfast', label: 'Before Breakfast' },
+  { value: 'after_breakfast', label: 'After Breakfast' },
+  { value: 'before_lunch', label: 'Before Lunch' },
+  { value: 'after_lunch', label: 'After Lunch' },
+  { value: 'before_dinner', label: 'Before Dinner' },
+  { value: 'after_dinner', label: 'After Dinner' },
+  { value: 'bedtime', label: 'At Bedtime' },
+];
+
 const EMPTY_FORM = {
   name: '',
   dosage: '',
   time: '',
+  mealSegment: 'other',
+  notes: '',
+  emailNotification: true,
   frequency: 'daily',
   endDate: '',
 };
@@ -29,7 +46,7 @@ function isCourseEnded(reminder) {
 }
 
 function formatTimeLabel(time) {
-  // time is stored as "HH:MM" — render as a 12-hour label for readability
+  if (!time) return '';
   const [h, m] = time.split(':').map(Number);
   if (Number.isNaN(h)) return time;
   const period = h >= 12 ? 'PM' : 'AM';
@@ -38,6 +55,7 @@ function formatTimeLabel(time) {
 }
 
 function minutesFromMidnight(time) {
+  if (!time) return 0;
   const [h, m] = time.split(':').map(Number);
   return h * 60 + m;
 }
@@ -52,6 +70,8 @@ function findNextDose(reminders) {
 }
 
 export default function Reminders() {
+  const navigate = useNavigate();
+  const [user] = useState(() => getUser());
   const [reminders, setReminders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -60,23 +80,48 @@ export default function Reminders() {
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
   const [updatingId, setUpdatingId] = useState(null);
+  const [sendingEmailId, setSendingEmailId] = useState(null);
+  const [emailFeedback, setEmailFeedback] = useState({ text: '', isError: false });
 
-  useEffect(() => {
-    loadReminders();
-  }, []);
-
-  async function loadReminders() {
-    setLoading(true);
-    setError('');
+  async function handleTestEmail(id) {
+    setSendingEmailId(id);
+    setEmailFeedback({ text: '', isError: false });
     try {
-      const data = await fetchReminders();
-      setReminders(data);
+      const res = await testReminderEmail(id);
+      setEmailFeedback({ text: res.message || 'Test email sent successfully! Check your inbox.', isError: false });
     } catch (err) {
-      setError(err.message);
+      setEmailFeedback({ text: err.message, isError: true });
     } finally {
-      setLoading(false);
+      setSendingEmailId(null);
     }
   }
+
+  useEffect(() => {
+    let isMounted = true;
+    async function fetchAllReminders() {
+      setLoading(true);
+      setError('');
+      try {
+        const data = await fetchReminders();
+        if (isMounted) {
+          setReminders(data || []);
+        }
+      } catch (err) {
+        if (isMounted) {
+          setError(err.message);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    }
+
+    fetchAllReminders();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const sortedReminders = useMemo(
     () => [...reminders].sort((a, b) => minutesFromMidnight(a.time) - minutesFromMidnight(b.time)),
@@ -88,7 +133,6 @@ export default function Reminders() {
   async function handleStatusChange(id, status) {
     setUpdatingId(id);
     const previous = reminders;
-    // Optimistic update so the timeline responds immediately
     setReminders((rs) => rs.map((r) => (r._id === id ? { ...r, status } : r)));
     try {
       await updateReminderStatus(id, status);
@@ -109,7 +153,7 @@ export default function Reminders() {
     setFormError('');
 
     if (!form.name || !form.dosage || !form.time || !form.endDate) {
-      setFormError('Fill in every field before saving.');
+      setFormError('Fill in all required fields before saving.');
       return;
     }
 
@@ -129,6 +173,25 @@ export default function Reminders() {
   return (
     <div className="reminders-page">
       <div className="rem-shell">
+        {/* Navigation Bar */}
+        <div className="rem-nav-bar">
+          <button className="rem-back-btn" onClick={() => navigate('/dashboard')}>
+            ← Back to Dashboard
+          </button>
+          <div className="rem-nav-user">
+            <span className="rem-user-name">{user?.name || 'Patient'}</span>
+            <button
+              className="rem-logout-btn"
+              onClick={() => {
+                clearSession();
+                navigate('/login');
+              }}
+            >
+              Log out
+            </button>
+          </div>
+        </div>
+
         <div className="rem-header">
           <div>
             <p className="rem-eyebrow">Today's schedule</p>
@@ -140,6 +203,27 @@ export default function Reminders() {
         </div>
 
         {error && <div className="rem-error-banner">{error}</div>}
+        {emailFeedback.text && (
+          <div
+            className="rem-error-banner"
+            style={{
+              background: emailFeedback.isError ? 'var(--skipped-soft)' : 'var(--taken-soft)',
+              color: emailFeedback.isError ? 'var(--skipped)' : 'var(--taken)',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}
+          >
+            <span>{emailFeedback.text}</span>
+            <button
+              type="button"
+              onClick={() => setEmailFeedback({ text: '', isError: false })}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              ✕
+            </button>
+          </div>
+        )}
 
         {/* Hero: next scheduled dose */}
         <div className="rem-hero">
@@ -170,6 +254,8 @@ export default function Reminders() {
             <div className="rem-timeline">
               {sortedReminders.map((r) => {
                 const ended = isCourseEnded(r);
+                const mealOption = MEAL_OPTIONS.find((m) => m.value === r.mealSegment);
+                const showMealBadge = mealOption && r.mealSegment && r.mealSegment !== 'other';
                 return (
                   <div
                     key={r._id}
@@ -178,11 +264,15 @@ export default function Reminders() {
                     <div className="rem-dose-left">
                       <span className="rem-dose-time">{formatTimeLabel(r.time)}</span>
                       <div>
-                        <div className="rem-dose-name">{r.name}</div>
+                        <div className="rem-dose-name">
+                          {r.name}
+                          {showMealBadge && <span className="rem-meal-badge">{mealOption.label}</span>}
+                        </div>
                         <div className="rem-dose-meta">
                           {r.dosage} · {r.frequency}
                           {ended ? ' · course ended' : ''}
                         </div>
+                        {r.notes && <div className="rem-notes-text">📌 {r.notes}</div>}
                       </div>
                     </div>
 
@@ -200,6 +290,16 @@ export default function Reminders() {
                             {STATUS_LABELS[status]}
                           </button>
                         ))}
+                        <button
+                          type="button"
+                          className="rem-pill-btn"
+                          title="Send a test notification email now"
+                          disabled={sendingEmailId === r._id}
+                          onClick={() => handleTestEmail(r._id)}
+                          style={{ borderColor: 'var(--rail)', fontSize: '0.75rem' }}
+                        >
+                          {sendingEmailId === r._id ? 'Sending…' : '✉️ Test Email'}
+                        </button>
                       </div>
                     )}
                   </div>
@@ -248,6 +348,34 @@ export default function Reminders() {
                   />
                 </div>
                 <div className="rem-field">
+                  <label htmlFor="mealSegment">Meal timing</label>
+                  <select
+                    id="mealSegment"
+                    value={form.mealSegment}
+                    onChange={(e) => handleFormChange('mealSegment', e.target.value)}
+                  >
+                    {MEAL_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="rem-field">
+                <label htmlFor="notes">Notes / Instructions</label>
+                <input
+                  id="notes"
+                  type="text"
+                  placeholder="e.g. Take after meals with glass of water"
+                  value={form.notes}
+                  onChange={(e) => handleFormChange('notes', e.target.value)}
+                />
+              </div>
+
+              <div className="rem-field-row">
+                <div className="rem-field">
                   <label htmlFor="frequency">Frequency</label>
                   <select
                     id="frequency"
@@ -259,16 +387,28 @@ export default function Reminders() {
                     <option value="custom">Custom</option>
                   </select>
                 </div>
+                <div className="rem-field">
+                  <label htmlFor="endDate">Course end date</label>
+                  <input
+                    id="endDate"
+                    type="date"
+                    value={form.endDate}
+                    onChange={(e) => handleFormChange('endDate', e.target.value)}
+                  />
+                </div>
               </div>
 
-              <div className="rem-field">
-                <label htmlFor="endDate">Stop after (course end date)</label>
+              <div className="rem-field" style={{ flexDirection: 'row', alignItems: 'center', gap: '0.6rem', marginTop: '0.2rem' }}>
                 <input
-                  id="endDate"
-                  type="date"
-                  value={form.endDate}
-                  onChange={(e) => handleFormChange('endDate', e.target.value)}
+                  id="emailNotification"
+                  type="checkbox"
+                  checked={form.emailNotification}
+                  onChange={(e) => handleFormChange('emailNotification', e.target.checked)}
+                  style={{ width: 'auto', margin: 0, cursor: 'pointer' }}
                 />
+                <label htmlFor="emailNotification" style={{ cursor: 'pointer', margin: 0, fontSize: '0.85rem' }}>
+                  Send email notification at dose time
+                </label>
               </div>
 
               {formError && <p style={{ color: 'var(--skipped)', fontSize: '0.85rem' }}>{formError}</p>}

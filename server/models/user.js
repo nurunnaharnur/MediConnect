@@ -5,11 +5,20 @@ const UserSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true },
-  age: { type: Number, required: true },
-  gender: { type: String, enum: ['Male', 'Female', 'Other'], required: true },
-  height: { type: Number, required: true }, 
-  weight: { type: Number, required: true }, 
-  medicalHistory: { type: String, default: "" }
+  role: { type: String, enum: ['patient', 'doctor'], default: 'patient' },
+  specialization: { type: String, default: '' },
+  licenseNumber: { type: String, default: '' },
+  age: { type: Number, default: 0 },
+  gender: { type: String, enum: ['Male', 'Female', 'Other', ''], default: '' },
+  height: { type: Number, default: 0 }, 
+  weight: { type: Number, default: 0 }, 
+  medicalHistory: { type: String, default: "" },
+  emergencyContact: {
+    name: { type: String, default: '' },
+    email: { type: String, default: '' },
+    phone: { type: String, default: '' },
+    relationship: { type: String, default: '' }
+  }
 }, { timestamps: true });
 
 UserSchema.pre('save', async function (next) {

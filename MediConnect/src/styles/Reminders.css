@@ -30,6 +30,67 @@
   margin: 0 auto;
 }
 
+/* ---------- Top Navigation Bar ---------- */
+.rem-nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #E7ECEA;
+}
+
+.rem-back-btn {
+  background: var(--surface);
+  border: 1px solid #D8E3E0;
+  color: var(--primary);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.45rem 0.95rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.rem-back-btn:hover {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+}
+
+.rem-nav-user {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.rem-user-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.rem-logout-btn {
+  background: transparent;
+  border: 1px solid #DDE4E2;
+  color: var(--muted);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.rem-logout-btn:hover {
+  background: #FEECEB;
+  color: #C4441C;
+  border-color: #F8D1CD;
+}
+
 .reminders-page .rem-header {
   display: flex;
   align-items: baseline;
@@ -69,7 +130,6 @@
   transition: transform 0.15s ease, background 0.15s ease;
 }
 .reminders-page .rem-add-btn:hover { background: #0F4E44; transform: translateY(-1px); }
-.reminders-page .rem-add-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ---------- Hero: next dose ---------- */
 .reminders-page .rem-hero {
@@ -127,7 +187,7 @@
   opacity: 0.9;
 }
 
-/* ---------- Timeline rail — the signature element ---------- */
+/* ---------- Timeline rail ---------- */
 .reminders-page .rem-timeline {
   position: relative;
   padding-left: 2.25rem;
@@ -185,13 +245,33 @@
   font-size: 1.05rem;
   font-variant-numeric: tabular-nums;
   color: var(--primary);
-  min-width: 3.4rem;
+  min-width: 5.5rem;
 }
 .reminders-page .rem-dose-name {
   font-family: 'Space Grotesk', sans-serif;
   font-weight: 600;
   font-size: 1.05rem;
 }
+
+.reminders-page .rem-meal-badge {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.72rem;
+  background: var(--primary-soft);
+  color: var(--primary);
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  margin-left: 0.6rem;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.reminders-page .rem-notes-text {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
 .reminders-page .rem-dose-meta {
   font-size: 0.83rem;
   color: var(--muted);
@@ -216,7 +296,6 @@
   color: var(--muted);
   transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
 }
-.reminders-page .rem-pill-btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .reminders-page .rem-pill-btn.taken.active,
 .reminders-page .rem-pill-btn.taken:hover { background: var(--taken-soft); color: var(--taken); border-color: var(--taken); }
@@ -225,143 +304,22 @@
 .reminders-page .rem-pill-btn.snoozed.active,
 .reminders-page .rem-pill-btn.snoozed:hover { background: var(--snoozed-soft); color: var(--snoozed); border-color: var(--snoozed); }
 
-.reminders-page .rem-status-tag {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  padding: 0.25rem 0.55rem;
-  border-radius: 6px;
-}
-.reminders-page .rem-status-tag.ended { background: #EEF0EF; color: var(--muted); }
+.reminders-page .rem-status-tag.ended { background: #EEF0EF; color: var(--muted); font-size: 0.75rem; padding: 0.2rem 0.5rem; border-radius: 4px; }
+.reminders-page .rem-section-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin: 2rem 0 0.9rem; }
+.reminders-page .rem-empty { text-align: center; padding: 3rem 1rem; color: var(--muted); }
+.reminders-page .rem-empty-title { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 1.15rem; color: var(--ink); margin-bottom: 0.4rem; }
+.reminders-page .rem-error-banner { background: var(--skipped-soft); color: var(--skipped); border-radius: 12px; padding: 0.8rem 1rem; font-size: 0.88rem; margin-bottom: 1.5rem; }
 
-.reminders-page .rem-section-label {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: 0.72rem;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin: 2rem 0 0.9rem;
-}
-
-.reminders-page .rem-empty {
-  text-align: center;
-  padding: 3rem 1rem;
-  color: var(--muted);
-}
-.reminders-page .rem-empty-title {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 600;
-  font-size: 1.15rem;
-  color: var(--ink);
-  margin-bottom: 0.4rem;
-}
-
-.reminders-page .rem-error-banner {
-  background: var(--skipped-soft);
-  color: var(--skipped);
-  border-radius: 12px;
-  padding: 0.8rem 1rem;
-  font-size: 0.88rem;
-  margin-bottom: 1.5rem;
-}
-
-/* ---------- Form panel ---------- */
-.reminders-page .rem-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(22, 36, 31, 0.35);
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 3rem 1rem;
-  z-index: 20;
-}
-
-.reminders-page .rem-form-card {
-  background: var(--surface);
-  border-radius: 18px;
-  padding: 1.75rem;
-  width: 100%;
-  max-width: 440px;
-  box-shadow: 0 20px 50px rgba(22, 36, 31, 0.18);
-}
-
-.reminders-page .rem-form-card h2 {
-  font-family: 'Space Grotesk', sans-serif;
-  font-size: 1.3rem;
-  margin: 0 0 1.25rem;
-}
-
-.reminders-page .rem-field {
-  margin-bottom: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-.reminders-page .rem-field label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--muted);
-}
-.reminders-page .rem-field input,
-.reminders-page .rem-field select {
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  padding: 0.6rem 0.7rem;
-  border-radius: 10px;
-  border: 1px solid #DDE4E2;
-  background: var(--paper);
-  color: var(--ink);
-}
-.reminders-page .rem-field input:focus,
-.reminders-page .rem-field select:focus {
-  outline: 2px solid var(--primary);
-  outline-offset: 1px;
-  background: #fff;
-}
-.reminders-page .rem-field-row {
-  display: flex;
-  gap: 0.75rem;
-}
+/* ---------- Form Modal ---------- */
+.reminders-page .rem-overlay { position: fixed; inset: 0; background: rgba(22, 36, 31, 0.35); display: flex; align-items: flex-start; justify-content: center; padding: 3rem 1rem; z-index: 20; }
+.reminders-page .rem-form-card { background: var(--surface); border-radius: 18px; padding: 1.75rem; width: 100%; max-width: 440px; box-shadow: 0 20px 50px rgba(22, 36, 31, 0.18); }
+.reminders-page .rem-form-card h2 { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; margin: 0 0 1.25rem; }
+.reminders-page .rem-field { margin-bottom: 1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+.reminders-page .rem-field label { font-size: 0.8rem; font-weight: 600; color: var(--muted); }
+.reminders-page .rem-field input, .reminders-page .rem-field select { font-family: 'Inter', sans-serif; font-size: 0.95rem; padding: 0.6rem 0.7rem; border-radius: 10px; border: 1px solid #DDE4E2; background: var(--paper); color: var(--ink); }
+.reminders-page .rem-field input:focus, .reminders-page .rem-field select:focus { outline: 2px solid var(--primary); outline-offset: 1px; background: #fff; }
+.reminders-page .rem-field-row { display: flex; gap: 0.75rem; }
 .reminders-page .rem-field-row .rem-field { flex: 1; }
-
-.reminders-page .rem-form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.6rem;
-  margin-top: 1.4rem;
-}
-.reminders-page .rem-btn-secondary {
-  font-family: 'Inter', sans-serif;
-  font-weight: 600;
-  font-size: 0.88rem;
-  background: transparent;
-  border: 1px solid #DDE4E2;
-  border-radius: 999px;
-  padding: 0.6rem 1.1rem;
-  cursor: pointer;
-  color: var(--muted);
-}
-.reminders-page .rem-btn-primary {
-  font-family: 'Space Grotesk', sans-serif;
-  font-weight: 600;
-  font-size: 0.88rem;
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  border-radius: 999px;
-  padding: 0.6rem 1.2rem;
-  cursor: pointer;
-}
-.reminders-page .rem-btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
-
-@media (prefers-reduced-motion: reduce) {
-  .reminders-page .rem-add-btn { transition: none; }
-}
-
-@media (max-width: 520px) {
-  .reminders-page .rem-hero-time { font-size: 1.9rem; }
-  .reminders-page .rem-dose { padding: 0.85rem; }
-  .reminders-page .rem-field-row { flex-direction: column; gap: 1rem; }
-}
+.reminders-page .rem-form-actions { display: flex; justify-content: flex-end; gap: 0.6rem; margin-top: 1.4rem; }
+.reminders-page .rem-btn-secondary { font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.88rem; background: transparent; border: 1px solid #DDE4E2; border-radius: 999px; padding: 0.6rem 1.1rem; cursor: pointer; color: var(--muted); }
+.reminders-page .rem-btn-primary { font-family: 'Space Grotesk', sans-serif; font-weight: 600; font-size: 0.88rem; background: var(--primary); color: #fff; border: none; border-radius: 999px; padding: 0.6rem 1.2rem; cursor: pointer; }

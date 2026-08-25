@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { loginUser, saveSession } from '../api/authApi';
+import { loginDoctor, saveSession } from '../api/authApi';
 import '../styles/auth.css';
 
-export default function Login() {
+export default function DoctorLogin() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
@@ -18,13 +18,9 @@ export default function Login() {
     setError('');
     setLoading(true);
     try {
-      const data = await loginUser(form);
+      const data = await loginDoctor(form);
       saveSession(data);
-      if (data.role === 'doctor') {
-        navigate('/doctor-dashboard');
-      } else {
-        navigate('/dashboard');
-      }
+      navigate('/doctor-dashboard');
     } catch (err) {
       setError(err.message);
     } finally {
@@ -34,10 +30,10 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <div className="auth-branding">
-        <p className="auth-brand-mark">MediConnect</p>
+      <div className="auth-branding" style={{ background: 'linear-gradient(135deg, #0F3D35 0%, #16241F 100%)' }}>
+        <p className="auth-brand-mark">MediConnect 🩺</p>
         <p className="auth-brand-tag">
-          Track your health, manage medication schedules, monitor emotional well-being, and stay connected with your care team.
+          Provider Clinical Portal — Securely review patient health histories, monitor mood and medication adherence trends, and manage appointments.
         </p>
         <div className="auth-pulse-wrap">
           <svg
@@ -48,24 +44,24 @@ export default function Login() {
           >
             <path
               d="M0 30 H120 L140 8 L158 52 L172 30 H210 L226 14 L242 46 L256 30 H400"
-              stroke="#c08a2e"
+              stroke="#20C997"
               strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
           </svg>
-          <p className="auth-pulse-caption">Patient Portal</p>
+          <p className="auth-pulse-caption">Clinical Provider Workspace</p>
         </div>
       </div>
 
       <div className="auth-formside">
         <div className="auth-card">
-          <div style={{ display: 'inline-block', background: '#E4EFEC', color: '#146356', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.6rem' }}>
-            PATIENT LOGIN
+          <div style={{ display: 'inline-block', background: '#D1E7DD', color: '#0F5132', padding: '4px 10px', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 'bold', marginBottom: '0.6rem' }}>
+            PHYSICIAN & PROVIDER PORTAL
           </div>
-          <h1 className="auth-heading">Sign in to your care</h1>
+          <h1 className="auth-heading">Doctor Sign In</h1>
           <p className="auth-subheading">
-            Enter your patient credentials to access your medications, mood trends, and health records.
+            Enter your medical provider credentials to access the patient clinical management dashboard.
           </p>
 
           <form className="auth-form" onSubmit={handleSubmit}>
@@ -73,14 +69,14 @@ export default function Login() {
 
             <div className="auth-field">
               <label className="auth-label" htmlFor="email">
-                Email Address
+                Doctor Email / Username
               </label>
               <input
                 id="email"
                 name="email"
                 type="email"
                 className="auth-input"
-                placeholder="patient@example.com"
+                placeholder="doctor@hospital.org"
                 value={form.email}
                 onChange={handleChange}
                 required
@@ -103,18 +99,18 @@ export default function Login() {
               />
             </div>
 
-            <button className="auth-button" type="submit" disabled={loading}>
-              {loading ? 'Signing in…' : 'Sign in as Patient'}
+            <button className="auth-button" type="submit" disabled={loading} style={{ background: '#0F4E44' }}>
+              {loading ? 'Authenticating…' : 'Sign in as Doctor'}
             </button>
           </form>
 
           <p className="auth-switch">
-            Don't have an account? <Link to="/register">Create one</Link>
+            New provider? <Link to="/doctor-register">Register doctor account</Link>
           </p>
 
-          {/* Doctor Portal Redirect as explicitly required */}
+          {/* Link back to Patient Login */}
           <div style={{ marginTop: '1.5rem', paddingTop: '1.25rem', borderTop: '1px solid #E7ECEA', textAlign: 'center', fontSize: '0.88rem', color: '#5B6B65' }}>
-            Are you a doctor? <Link to="/doctor-login" style={{ color: '#146356', fontWeight: '700', textDecoration: 'none' }}>Login here</Link>
+            Are you a patient? <Link to="/login" style={{ color: '#146356', fontWeight: '700', textDecoration: 'none' }}>Login here</Link>
           </div>
         </div>
       </div>
